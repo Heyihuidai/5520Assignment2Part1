@@ -1,15 +1,15 @@
 export const styleHelper = {
   colors: {
-    primary: '#4a90e2',
-    secondary: '#f5a623',
-    background: {
-      light: '#ffffff',
-      dark: '#121212',
+    light: {
+      primary: '#5e35b1',
+      background: '#e6e1f2',
+      text: '#000000',
     },
-    text: {
-      light: '#000000',
-      dark: '#ffffff',
-    },
+    dark: {
+      primary: '#5e35b1',
+      background: '#121212',
+      text: '#ffffff',
+    }
   },
   spacing: {
     small: 8,
@@ -87,7 +87,14 @@ export const styleHelper = {
   },
 };
 
-export const getThemeColors = (isDarkMode) => ({
-  background: isDarkMode ? styleHelper.colors.background.dark : styleHelper.colors.background.light,
-  text: isDarkMode ? styleHelper.colors.text.dark : styleHelper.colors.text.light,
-});
+export const getThemeColors = (isDarkMode) => {
+  if (!styleHelper || !styleHelper.colors) {
+    console.error('styleHelper or styleHelper.colors is undefined');
+    return {};
+  }
+  
+  return {
+    background: isDarkMode ? styleHelper.colors.dark.background : styleHelper.colors.light.background,
+    text: isDarkMode ? styleHelper.colors.dark.text : styleHelper.colors.light.text,
+  };
+};

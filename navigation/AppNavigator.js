@@ -2,19 +2,25 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
-import { styleHelper } from '../helper/styleHelper';
 import ActivitiesScreen from '../screens/ActivitiesScreen';
-import AddActivityScreen from '../screens/AddActivityScreen';
-import AddDietEntryScreen from '../screens/AddDietEntryScreen';
 import DietScreen from '../screens/DietScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import AddActivityScreen from '../screens/AddActivityScreen';
+import AddDietEntryScreen from '../screens/AddDietEntryScreen';
+import { useTheme } from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainTabs() {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
+  console.log('Theme in MainTabs:', theme);
+
+  if (!theme || !theme.colors) {
+    console.error('Theme or theme.colors is undefined');
+    return null;
+  }
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -29,11 +35,15 @@ function MainTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: styleHelper.colors.primary,
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: isDarkMode ? '#888' : '#555',
         tabBarStyle: {
-          backgroundColor: isDarkMode ? styleHelper.colors.background.dark : styleHelper.colors.background.light,
+          backgroundColor: theme.colors.background,
         },
+        headerStyle: {
+          backgroundColor: theme.colors.primary,
+        },
+        headerTintColor: theme.colors.text,
       })}
     >
       <Tab.Screen name="Activities" component={ActivitiesScreen} />
@@ -44,8 +54,17 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
+  const { theme } = useTheme();
+
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.colors.primary,
+        },
+        headerTintColor: theme.colors.text,
+      }}
+    >
       <Stack.Screen 
         name="Main" 
         component={MainTabs} 
