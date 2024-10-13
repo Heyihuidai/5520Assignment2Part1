@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { useData } from '../context/DataContext';
-import { useTheme } from '../context/ThemeContext';
-import { styleHelper, getThemeColors } from '../helper/styleHelper';
+import { useData } from '../../context/DataContext';
+import { useTheme } from '../../context/ThemeContext';
+import { styleHelper, getThemeColors } from '../../helper/styleHelper';
 
 export default function ItemsList({ type }) {
   const { activities, dietEntries } = useData();
