@@ -12,13 +12,21 @@ export default function ItemsList({ type }) {
 
   const data = type === 'activity' ? activities : dietEntries;
 
+  const isSpecial = (item) => {
+    if (type === 'activity') {
+      return (item.activityType === 'Running' || item.activityType === 'Weight Training') && item.duration > 60;
+    } else {
+      return item.calories > 800;
+    }
+  };
+
   const renderItem = ({ item }) => (
-    <View style={styleHelper.itemsList.item}>
+    <View style={[styleHelper.itemsList.item, { backgroundColor: themeColors.cardBackground }]}>
       <View style={styleHelper.itemsList.itemHeader}>
         <Text style={[styleHelper.itemsList.itemTitle, { color: themeColors.text }]}>
           {type === 'activity' ? item.activityType : item.description}
         </Text>
-        {item.isSpecial && (
+        {isSpecial(item) && (
           <Ionicons name="warning" size={20} color={themeColors.warning} />
         )}
       </View>
