@@ -1,4 +1,5 @@
 import React from 'react';
+import { TouchableOpacity, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,18 +9,28 @@ import SettingsScreen from '../screens/SettingsScreen';
 import AddActivityScreen from '../screens/AddActivityScreen';
 import AddDietEntryScreen from '../screens/AddDietEntryScreen';
 import { useTheme } from '../context/ThemeContext';
+import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainTabs() {
-  const { theme, isDarkMode } = useTheme();
-  console.log('Theme in MainTabs:', theme);
+  const { isDarkMode } = useTheme();
+  const themeColors = getThemeColors(isDarkMode);
 
-  if (!theme || !theme.colors) {
-    console.error('Theme or theme.colors is undefined');
-    return null;
-  }
+  const addButton = (navigation, navigateTo) => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate(navigateTo)}
+      style={styleHelper.header?.addButton || { marginRight: 15 }}
+    >
+      <Text style={[
+        styleHelper.header?.addButtonText || { fontSize: 16, fontWeight: 'bold' },
+        { color: themeColors.headerText }
+      ]}>
+        Add
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <Tab.Navigator
@@ -35,35 +46,49 @@ function MainTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: theme.colors.tabIcon, // Use the new orange color
-        tabBarInactiveTintColor: isDarkMode ? 'rgba(255,165,0,0.5)' : 'rgba(255,165,0,0.7)', // Semi-transparent orange
+        tabBarActiveTintColor: themeColors.tabIcon,
+        tabBarInactiveTintColor: themeColors.tabBarInactiveIcon,
         tabBarStyle: {
-          backgroundColor: theme.colors.tabBarBackground, // Use the new tab bar background color
-          borderTopWidth: 0, // Remove the top border
+          backgroundColor: themeColors.tabBarBackground,
+          borderTopWidth: 0,
         },
         headerStyle: {
-          backgroundColor: theme.colors.primary,
+          backgroundColor: themeColors.primary,
         },
-        headerTintColor: theme.colors.headerText, // Use headerText color for better contrast
+        headerTintColor: themeColors.headerText,
+        headerShown: true,
       })}
     >
-      <Tab.Screen name="Activities" component={ActivitiesScreen} />
-      <Tab.Screen name="Diet" component={DietScreen} />
+      <Tab.Screen 
+        name="Activities" 
+        component={ActivitiesScreen}
+        options={({ navigation }) => ({
+          headerRight: () => addButton(navigation, 'AddActivity'),
+        })}
+      />
+      <Tab.Screen 
+        name="Diet" 
+        component={DietScreen}
+        options={({ navigation }) => ({
+          headerRight: () => addButton(navigation, 'AddDietEntry'),
+        })}
+      />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
 }
 
 export default function AppNavigator() {
-  const { theme } = useTheme();
+  const { isDarkMode } = useTheme();
+  const themeColors = getThemeColors(isDarkMode);
 
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: theme.colors.primary,
+          backgroundColor: themeColors.primary,
         },
-        headerTintColor: theme.colors.headerText, // Use headerText color for better contrast
+        headerTintColor: themeColors.headerText,
       }}
     >
       <Stack.Screen 
