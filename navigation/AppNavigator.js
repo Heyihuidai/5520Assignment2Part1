@@ -35,15 +35,16 @@ function MainTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: isDarkMode ? '#888' : '#555',
+        tabBarActiveTintColor: theme.colors.tabIcon, // Use the new orange color
+        tabBarInactiveTintColor: isDarkMode ? 'rgba(255,165,0,0.5)' : 'rgba(255,165,0,0.7)', // Semi-transparent orange
         tabBarStyle: {
-          backgroundColor: theme.colors.background,
+          backgroundColor: theme.colors.tabBarBackground, // Use the new tab bar background color
+          borderTopWidth: 0, // Remove the top border
         },
         headerStyle: {
           backgroundColor: theme.colors.primary,
         },
-        headerTintColor: theme.colors.text,
+        headerTintColor: theme.colors.headerText, // Use headerText color for better contrast
       })}
     >
       <Tab.Screen name="Activities" component={ActivitiesScreen} />
@@ -62,7 +63,7 @@ export default function AppNavigator() {
         headerStyle: {
           backgroundColor: theme.colors.primary,
         },
-        headerTintColor: theme.colors.text,
+        headerTintColor: theme.colors.headerText, // Use headerText color for better contrast
       }}
     >
       <Stack.Screen 

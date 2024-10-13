@@ -5,12 +5,20 @@ export const styleHelper = {
       background: '#e6e1f2',
       text: '#000000',
       inputBackground: '#d3d3d3',
+      headerText: '#ffffff',
+      tabIcon: '#FFA500', // Orange color for tab icons
+      tabBarBackground: '#5e35b1', // Same as primary for consistency
+      tabBarInactiveIcon: 'rgba(255,165,0,0.7)', // Semi-transparent orange
     },
     dark: {
       primary: '#5e35b1',
       background: '#121212',
       text: '#ffffff',
       inputBackground: '#2a2a2a',
+      headerText: '#ffffff',
+      tabIcon: '#FFA500', // Orange color for tab icons
+      tabBarBackground: '#5e35b1', // Same as primary for consistency
+      tabBarInactiveIcon: 'rgba(255,165,0,0.5)', // Semi-transparent orange
     }
   },
   spacing: {
