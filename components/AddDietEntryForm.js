@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
@@ -19,13 +19,13 @@ export default function AddDietEntryForm() {
 
   const handleSave = () => {
     if (!description || !calories) {
-      Alert.alert('Error', 'Please fill in all fields');
+      alert('Please fill in all fields');
       return;
     }
 
     const caloriesNum = parseInt(calories, 10);
     if (isNaN(caloriesNum) || caloriesNum < 0) {
-      Alert.alert('Error', 'Please enter a valid number of calories');
+      alert('Please enter a valid number of calories');
       return;
     }
 
@@ -41,25 +41,31 @@ export default function AddDietEntryForm() {
   };
 
   const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false);
-    setDate(currentDate);
+    if (selectedDate) {
+      setDate(selectedDate);
+      setShowDatePicker(false);
+    }
+  };
+
+  const formatDate = (date) => {
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
   };
 
   return (
-    <View style={[styleHelper.forms.container, { backgroundColor: themeColors.background }]}>
-      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Description:</Text>
+    <View style={styleHelper.forms.container}>
+      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Description *</Text>
       <TextInput
-        style={[styleHelper.forms.input, { color: themeColors.text, borderColor: themeColors.text }]}
+        style={[styleHelper.forms.input, { color: themeColors.text }]}
         value={description}
         onChangeText={setDescription}
         placeholder="Enter food description"
         placeholderTextColor={themeColors.text}
       />
 
-      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Calories:</Text>
+      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Calories *</Text>
       <TextInput
-        style={[styleHelper.forms.input, { color: themeColors.text, borderColor: themeColors.text }]}
+        style={[styleHelper.forms.input, { color: themeColors.text }]}
         value={calories}
         onChangeText={setCalories}
         keyboardType="numeric"
@@ -67,22 +73,37 @@ export default function AddDietEntryForm() {
         placeholderTextColor={themeColors.text}
       />
 
-      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date:</Text>
-      <Button title="Select date" onPress={() => setShowDatePicker(true)} />
+      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
+      <TouchableOpacity
+        style={styleHelper.forms.dateInput}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text style={{ color: themeColors.text }}>{formatDate(date)}</Text>
+      </TouchableOpacity>
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
-          display="default"
+          display="inline"
           onChange={onChangeDate}
+          style={styleHelper.forms.datePicker}
         />
       )}
 
-      <Text style={[styleHelper.forms.dateText, { color: themeColors.text }]}>
-        Selected date: {date.toISOString().split('T')[0]}
-      </Text>
-
-      <Button title="Save" onPress={handleSave} />
+      <View style={styleHelper.forms.buttonContainer}>
+        <TouchableOpacity 
+          style={styleHelper.forms.cancelButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styleHelper.forms.saveButton}
+          onPress={handleSave}
+        >
+          <Text style={styleHelper.forms.saveButtonText}>Save</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

@@ -93,6 +93,34 @@ export const styleHelper = {
       fontSize: 16,
       fontWeight: 'bold',
     },
+    cancelButton: {
+      flex: 1,
+      padding: 10,
+      marginHorizontal: 5,
+      borderRadius: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'transparent',
+    },
+    saveButton: {
+      flex: 1,
+      padding: 10,
+      marginHorizontal: 5,
+      borderRadius: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: themeColors.primary,
+    },
+    cancelButtonText: {
+      color: themeColors.primary,
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    saveButtonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
   },
   screens: {
     container: {

@@ -103,18 +103,18 @@ export default function AddActivityForm() {
         />
       )}
 
-      <View style={styleHelper.forms.buttonContainer}>
+<View style={styleHelper.forms.buttonContainer}>
         <TouchableOpacity 
-          style={[styleHelper.forms.button, { backgroundColor: 'transparent' }]}
+          style={styleHelper.forms.cancelButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={[styleHelper.forms.buttonText, { color: themeColors.primary }]}>Cancel</Text>
+          <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styleHelper.forms.button, { backgroundColor: themeColors.primary }]}
+          style={styleHelper.forms.saveButton}
           onPress={handleSave}
         >
-          <Text style={[styleHelper.forms.buttonText, { color: 'white' }]}>Save</Text>
+          <Text style={styleHelper.forms.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
     </View>
