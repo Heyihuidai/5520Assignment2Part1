@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider } from './context/ThemeContext';
-import { DataProvider } from './context/DataContext';
-import AppNavigator from './navigation/AppNavigator';
+import { ThemeProvider } from './app/context/ThemeContext';
+import { DataProvider } from './app/context/DataContext';
+
+import AppNavigator from './app/navigation/AppNavigator'; 
 
 export default function App() {
   return (
