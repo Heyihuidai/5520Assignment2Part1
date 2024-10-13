@@ -51,6 +51,40 @@ export const styleHelper = {
       marginBottom: 16,
     },
   },
+  screens: {
+    container: {
+      flex: 1,
+    },
+    formContainer: {
+      flex: 1,
+      padding: 20,
+    },
+    addButton: {
+      position: 'absolute',
+      right: 20,
+      bottom: 20,
+      backgroundColor: 'white',
+      borderRadius: 30,
+      width: 60,
+      height: 60,
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    setting: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    settingText: {
+      fontSize: 16,
+    },
+  },
 };
 
 export const getThemeColors = (isDarkMode) => ({
