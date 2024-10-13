@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useData } from '../context/DataContext';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
@@ -12,16 +13,23 @@ export default function ItemsList({ type }) {
   const data = type === 'activity' ? activities : dietEntries;
 
   const renderItem = ({ item }) => (
-    <View style={[styles.item, { backgroundColor: themeColors.background }]}>
-      <Text style={[styles.itemText, { color: themeColors.text }]}>
-        {type === 'activity' ? item.activityType : item.description}
-      </Text>
-      <Text style={[styles.itemText, { color: themeColors.text }]}>
-        {type === 'activity' ? `${item.duration} min` : `${item.calories} cal`}
-      </Text>
-      <Text style={[styles.itemText, { color: themeColors.text }]}>
-        {item.date}
-      </Text>
+    <View style={styleHelper.itemsList.item}>
+      <View style={styleHelper.itemsList.itemHeader}>
+        <Text style={[styleHelper.itemsList.itemTitle, { color: themeColors.text }]}>
+          {type === 'activity' ? item.activityType : item.description}
+        </Text>
+        {item.isSpecial && (
+          <Ionicons name="warning" size={20} color={themeColors.warning} />
+        )}
+      </View>
+      <View style={styleHelper.itemsList.itemDetails}>
+        <Text style={[styleHelper.itemsList.itemText, { color: themeColors.text }]}>
+          {type === 'activity' ? `${item.duration} min` : `${item.calories} cal`}
+        </Text>
+        <Text style={[styleHelper.itemsList.itemText, { color: themeColors.text }]}>
+          {item.date}
+        </Text>
+      </View>
     </View>
   );
 
@@ -31,27 +39,10 @@ export default function ItemsList({ type }) {
       renderItem={renderItem}
       keyExtractor={(item, index) => index.toString()}
       ListEmptyComponent={
-        <Text style={[styles.emptyText, { color: themeColors.text }]}>
+        <Text style={[styleHelper.itemsList.emptyText, { color: themeColors.text }]}>
           No {type} entries yet.
         </Text>
       }
     />
   );
 }
-
-const styles = StyleSheet.create({
-  item: {
-    padding: styleHelper.spacing.medium,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  itemText: {
-    fontSize: styleHelper.fontSize.medium,
-    marginBottom: styleHelper.spacing.small,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: styleHelper.spacing.large,
-    fontSize: styleHelper.fontSize.medium,
-  },
-});

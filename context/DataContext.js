@@ -7,11 +7,13 @@ export const DataProvider = ({ children }) => {
   const [dietEntries, setDietEntries] = useState([]);
 
   const addActivity = (activity) => {
-    setActivities(prevActivities => [...prevActivities, activity]);
+    const isSpecial = (activity.activityType === 'Running' || activity.activityType === 'Weights') && activity.duration > 60;
+    setActivities(prevActivities => [...prevActivities, { ...activity, isSpecial }]);
   };
 
   const addDietEntry = (entry) => {
-    setDietEntries(prevEntries => [...prevEntries, entry]);
+    const isSpecial = entry.calories > 800;
+    setDietEntries(prevEntries => [...prevEntries, { ...entry, isSpecial }]);
   };
 
   return (

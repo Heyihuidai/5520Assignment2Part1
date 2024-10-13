@@ -18,7 +18,7 @@ export default function ActivitiesScreen() {
         style={styleHelper.screens.addButton}
         onPress={() => navigation.navigate('AddActivity')}
       >
-        <Ionicons name="add" size={30} color={styleHelper.colors.primary} />
+        <Ionicons name="add" size={30} color={themeColors.primary} />
       </TouchableOpacity>
     </View>
   );

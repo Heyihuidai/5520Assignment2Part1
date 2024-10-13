@@ -109,10 +109,10 @@ export const styleHelper = {
       borderRadius: 5,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: themeColors.primary,
+      backgroundColor: '#5e35b1', // Purple color
     },
     cancelButtonText: {
-      color: themeColors.primary,
+      color: '#5e35b1', // Purple color
       fontSize: 16,
       fontWeight: 'bold',
     },
@@ -185,6 +185,39 @@ export const styleHelper = {
     subText: {
       fontSize: 14,
       marginTop: 4,
+    },
+  },
+  itemsList: {
+    item: {
+      padding: 16,
+      marginBottom: 8,
+      borderRadius: 8,
+      backgroundColor: '#4A4A4A',
+    },
+    itemHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    itemTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: 'white',
+    },
+    itemDetails: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    itemText: {
+      fontSize: 14,
+      color: 'white',
+    },
+    emptyText: {
+      textAlign: 'center',
+      marginTop: 32,
+      fontSize: 16,
+      color: 'white',
     },
   },
 };
