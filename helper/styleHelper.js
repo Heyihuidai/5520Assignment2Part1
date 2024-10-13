@@ -6,9 +6,10 @@ export const styleHelper = {
       text: '#000000',
       inputBackground: '#d3d3d3',
       headerText: '#ffffff',
-      tabIcon: '#FFA500', // Orange color for tab icons
-      tabBarBackground: '#5e35b1', // Same as primary for consistency
-      tabBarInactiveIcon: 'rgba(255,165,0,0.7)', // Semi-transparent orange
+      tabIcon: '#FFA500',
+      tabBarBackground: '#5e35b1',
+      tabBarInactiveIcon: 'rgba(255,165,0,0.7)',
+      listItemBackground: '#d3d3d3',
     },
     dark: {
       primary: '#5e35b1',
@@ -16,9 +17,10 @@ export const styleHelper = {
       text: '#ffffff',
       inputBackground: '#2a2a2a',
       headerText: '#ffffff',
-      tabIcon: '#FFA500', // Orange color for tab icons
-      tabBarBackground: '#5e35b1', // Same as primary for consistency
-      tabBarInactiveIcon: 'rgba(255,165,0,0.5)', // Semi-transparent orange
+      tabIcon: '#FFA500',
+      tabBarBackground: '#5e35b1',
+      tabBarInactiveIcon: 'rgba(255,165,0,0.5)',
+      listItemBackground: '#8B4513',
     }
   },
   spacing: {
@@ -191,7 +193,6 @@ export const styleHelper = {
       padding: 16,
       marginBottom: 8,
       borderRadius: 8,
-      backgroundColor: '#4A4A4A',
     },
     itemHeader: {
       flexDirection: 'row',

@@ -14,20 +14,23 @@ export default function ItemsList({ type }) {
 
   const isSpecial = (item) => {
     if (type === 'activity') {
-      return (item.activityType === 'Running' || item.activityType === 'Weight Training') && item.duration > 60;
+      return (item.activityType === 'Running' || item.activityType === 'Weights') && item.duration > 60;
     } else {
       return item.calories > 800;
     }
   };
 
   const renderItem = ({ item }) => (
-    <View style={[styleHelper.itemsList.item, { backgroundColor: themeColors.cardBackground }]}>
+    <View style={[
+      styleHelper.itemsList.item, 
+      { backgroundColor: themeColors.listItemBackground }
+    ]}>
       <View style={styleHelper.itemsList.itemHeader}>
         <Text style={[styleHelper.itemsList.itemTitle, { color: themeColors.text }]}>
           {type === 'activity' ? item.activityType : item.description}
         </Text>
         {isSpecial(item) && (
-          <Ionicons name="warning" size={20} color={themeColors.warning} />
+          <Ionicons name="warning" size={20} color={themeColors.tabIcon} />
         )}
       </View>
       <View style={styleHelper.itemsList.itemDetails}>
