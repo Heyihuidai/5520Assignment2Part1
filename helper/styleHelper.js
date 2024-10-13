@@ -1,40 +1,59 @@
 export const styleHelper = {
-    colors: {
-      primary: '#4a90e2',
-      secondary: '#f5a623',
-      background: {
-        light: '#ffffff',
-        dark: '#121212',
-      },
-      text: {
-        light: '#000000',
-        dark: '#ffffff',
-      },
+  colors: {
+    primary: '#4a90e2',
+    secondary: '#f5a623',
+    background: {
+      light: '#ffffff',
+      dark: '#121212',
     },
-    spacing: {
-      small: 8,
-      medium: 16,
-      large: 24,
+    text: {
+      light: '#000000',
+      dark: '#ffffff',
     },
-    fontSize: {
-      small: 12,
-      medium: 16,
-      large: 20,
-      xlarge: 24,
+  },
+  spacing: {
+    small: 8,
+    medium: 16,
+    large: 24,
+  },
+  fontSize: {
+    small: 12,
+    medium: 16,
+    large: 20,
+    xlarge: 24,
+  },
+  borderRadius: {
+    small: 4,
+    medium: 8,
+    large: 12,
+  },
+  forms: {
+    container: {
+      flex: 1,
+      padding: 16,
     },
-    padding: {
-      small: 5,
-      medium: 10,
-      large: 15,
+    label: {
+      fontSize: 16,
+      marginBottom: 8,
     },
-    borderRadius: {
-      small: 4,
-      medium: 8,
-      large: 12,
+    input: {
+      height: 40,
+      borderWidth: 1,
+      borderRadius: 4,
+      marginBottom: 16,
+      paddingHorizontal: 8,
     },
-  };
-  
-  export const getThemeColors = (isDarkMode) => ({
-    background: isDarkMode ? styleHelper.colors.background.dark : styleHelper.colors.background.light,
-    text: isDarkMode ? styleHelper.colors.text.dark : styleHelper.colors.text.light,
-  });
+    picker: {
+      marginBottom: 16,
+    },
+    dateText: {
+      marginTop: 8,
+      marginBottom: 16,
+    },
+  },
+};
+
+export const getThemeColors = (isDarkMode) => ({
+  background: isDarkMode ? styleHelper.colors.background.dark : styleHelper.colors.background.light,
+  text: isDarkMode ? styleHelper.colors.text.dark : styleHelper.colors.text.light,
+});
