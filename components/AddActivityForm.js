@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, TouchableOpacity, Platform } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
@@ -8,7 +8,18 @@ import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
 export default function AddActivityForm() {
-  const [activityType, setActivityType] = useState('');
+  const [open, setOpen] = useState(false);
+  const [activityType, setActivityType] = useState(null);
+  const [items, setItems] = useState([
+    {label: 'Walking', value: 'Walking'},
+    {label: 'Running', value: 'Running'},
+    {label: 'Swimming', value: 'Swimming'},
+    {label: 'Weights', value: 'Weights'},
+    {label: 'Yoga', value: 'Yoga'},
+    {label: 'Cycling', value: 'Cycling'},
+    {label: 'Hiking', value: 'Hiking'},
+    {label: 'Other', value: 'Other'},
+  ]);
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -20,21 +31,14 @@ export default function AddActivityForm() {
 
   const handleSave = () => {
     if (!activityType || !duration) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    const durationNum = parseInt(duration, 10);
-    if (isNaN(durationNum) || durationNum <= 0) {
-      Alert.alert('Error', 'Please enter a valid duration');
+      alert('Please fill in all fields');
       return;
     }
 
     const newActivity = {
       activityType,
-      duration: durationNum,
+      duration: parseInt(duration, 10),
       date: date.toISOString().split('T')[0],
-      isSpecial: (activityType === 'Running' || activityType === 'Weight Training') && durationNum > 60
     };
 
     addActivity(newActivity);
@@ -42,32 +46,39 @@ export default function AddActivityForm() {
   };
 
   const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false);
-    setDate(currentDate);
+    if (selectedDate) {
+      setDate(selectedDate);
+      setShowDatePicker(false);
+    }
+  };
+
+  const formatDate = (date) => {
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
   };
 
   return (
-    <View style={[styleHelper.forms.container, { backgroundColor: themeColors.background }]}>
-      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Activity Type:</Text>
-      <Picker
-        selectedValue={activityType}
-        onValueChange={(itemValue) => setActivityType(itemValue)}
-        style={[styleHelper.forms.picker, { color: themeColors.text }]}
-      >
-        <Picker.Item label="Select an activity" value="" />
-        <Picker.Item label="Walking" value="Walking" />
-        <Picker.Item label="Running" value="Running" />
-        <Picker.Item label="Swimming" value="Swimming" />
-        <Picker.Item label="Weight Training" value="Weight Training" />
-        <Picker.Item label="Yoga" value="Yoga" />
-        <Picker.Item label="Cycling" value="Cycling" />
-        <Picker.Item label="Hiking" value="Hiking" />
-      </Picker>
+    <View style={styleHelper.forms.container}>
+      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Activity *</Text>
+      <DropDownPicker
+        open={open}
+        value={activityType}
+        items={items}
+        setOpen={setOpen}
+        setValue={setActivityType}
+        setItems={setItems}
+        placeholder="Select An Activity"
+        style={styleHelper.forms.dropdownInput}
+        textStyle={styleHelper.forms.dropdownText}
+        dropDownContainerStyle={[
+          styleHelper.forms.dropdownContainer,
+          { maxHeight: 2000 }
+        ]}
+      />
 
-      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Duration (minutes):</Text>
+      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Duration (min) *</Text>
       <TextInput
-        style={[styleHelper.forms.input, { color: themeColors.text, borderColor: themeColors.text }]}
+        style={[styleHelper.forms.input, { color: themeColors.text }]}
         value={duration}
         onChangeText={setDuration}
         keyboardType="numeric"
@@ -75,22 +86,37 @@ export default function AddActivityForm() {
         placeholderTextColor={themeColors.text}
       />
 
-      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date:</Text>
-      <Button title="Select date" onPress={() => setShowDatePicker(true)} />
+      <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
+      <TouchableOpacity
+        style={styleHelper.forms.dateInput}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text style={{ color: themeColors.text }}>{formatDate(date)}</Text>
+      </TouchableOpacity>
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
-          display="default"
+          display="inline"
           onChange={onChangeDate}
+          style={styleHelper.forms.datePicker}
         />
       )}
 
-      <Text style={[styleHelper.forms.dateText, { color: themeColors.text }]}>
-        Selected date: {date.toISOString().split('T')[0]}
-      </Text>
-
-      <Button title="Save" onPress={handleSave} />
+      <View style={styleHelper.forms.buttonContainer}>
+        <TouchableOpacity 
+          style={[styleHelper.forms.button, { backgroundColor: 'transparent' }]}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={[styleHelper.forms.buttonText, { color: themeColors.primary }]}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styleHelper.forms.button, { backgroundColor: themeColors.primary }]}
+          onPress={handleSave}
+        >
+          <Text style={[styleHelper.forms.buttonText, { color: 'white' }]}>Save</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

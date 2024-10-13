@@ -4,11 +4,13 @@ export const styleHelper = {
       primary: '#5e35b1',
       background: '#e6e1f2',
       text: '#000000',
+      inputBackground: '#d3d3d3',
     },
     dark: {
       primary: '#5e35b1',
       background: '#121212',
       text: '#ffffff',
+      inputBackground: '#2a2a2a',
     }
   },
   spacing: {
@@ -35,20 +37,61 @@ export const styleHelper = {
     label: {
       fontSize: 16,
       marginBottom: 8,
+      fontWeight: '500',
     },
     input: {
-      height: 40,
+      height: 48,
       borderWidth: 1,
-      borderRadius: 4,
+      borderRadius: 8,
       marginBottom: 16,
-      paddingHorizontal: 8,
+      paddingHorizontal: 12,
+      justifyContent: 'center',
+      backgroundColor: '#d3d3d3',
     },
-    picker: {
+    dropdownInput: {
+      backgroundColor: '#d3d3d3',
+      borderColor: '#d3d3d3',
       marginBottom: 16,
+    },
+    dropdownText: {
+      fontSize: 16,
+    },
+    dropdownContainer: {
+      backgroundColor: 'white',
+      borderColor: '#dfdfdf',
+    },
+    dateInput: {
+      height: 48,
+      borderWidth: 1,
+      borderRadius: 8,
+      marginBottom: 16,
+      paddingHorizontal: 12,
+      backgroundColor: '#d3d3d3',
+      justifyContent: 'center',
+    },
+    datePicker: {
+      backgroundColor: 'white',
+      marginBottom: 20,
     },
     dateText: {
       marginTop: 8,
       marginBottom: 16,
+      fontSize: 16,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 20,
+    },
+    button: {
+      padding: 10,
+      borderRadius: 5,
+      width: '45%',
+      alignItems: 'center',
+    },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: 'bold',
     },
   },
   screens: {
@@ -58,6 +101,21 @@ export const styleHelper = {
     formContainer: {
       flex: 1,
       padding: 20,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+    },
+    headerText: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
     },
     addButton: {
       position: 'absolute',
@@ -85,6 +143,22 @@ export const styleHelper = {
       fontSize: 16,
     },
   },
+  listItem: {
+    container: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+    },
+    text: {
+      fontSize: 16,
+    },
+    subText: {
+      fontSize: 14,
+      marginTop: 4,
+    },
+  },
 };
 
 export const getThemeColors = (isDarkMode) => {
@@ -93,8 +167,5 @@ export const getThemeColors = (isDarkMode) => {
     return {};
   }
   
-  return {
-    background: isDarkMode ? styleHelper.colors.dark.background : styleHelper.colors.light.background,
-    text: isDarkMode ? styleHelper.colors.dark.text : styleHelper.colors.light.text,
-  };
+  return isDarkMode ? styleHelper.colors.dark : styleHelper.colors.light;
 };

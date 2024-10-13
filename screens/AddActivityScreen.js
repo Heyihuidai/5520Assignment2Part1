@@ -9,7 +9,7 @@ export default function AddActivityScreen() {
   const themeColors = getThemeColors(isDarkMode);
 
   return (
-    <View style={[styleHelper.screens.formContainer, { backgroundColor: themeColors.background }]}>
+    <View style={[styleHelper.screens.container, { backgroundColor: themeColors.background }]}>
       <AddActivityForm />
     </View>
   );
