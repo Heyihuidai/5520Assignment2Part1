@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -30,8 +30,12 @@ export default function AddActivityForm() {
   const themeColors = getThemeColors(isDarkMode);
 
   const handleSave = () => {
-    if (!activityType || !duration) {
-      alert('Please fill in all fields');
+    if (!activityType) {
+      Alert.alert("Alert", "Please select an activity.");
+      return;
+    }
+    if (!duration || isNaN(duration) || parseInt(duration, 10) <= 0) {
+      Alert.alert("Alert", "Please enter a valid duration (greater than 0).");
       return;
     }
 
@@ -41,15 +45,18 @@ export default function AddActivityForm() {
       date: date.toISOString().split('T')[0],
     };
 
-    addActivity(newActivity);
-    navigation.goBack();
+    const success = addActivity(newActivity);
+    if (success) {
+      navigation.goBack();
+    } else {
+      Alert.alert("Alert", "Failed to add activity. Please try again.");
+    }
   };
 
   const onChangeDate = (event, selectedDate) => {
-    if (selectedDate) {
-      setDate(selectedDate);
-      setShowDatePicker(false);
-    }
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDate(currentDate);
   };
 
   const formatDate = (date) => {
@@ -72,7 +79,7 @@ export default function AddActivityForm() {
         textStyle={styleHelper.forms.dropdownText}
         dropDownContainerStyle={[
           styleHelper.forms.dropdownContainer,
-          { maxHeight: 2000 }
+          { maxHeight: 200 }
         ]}
       />
 
@@ -97,13 +104,13 @@ export default function AddActivityForm() {
         <DateTimePicker
           value={date}
           mode="date"
-          display="inline"
+          display="default"
           onChange={onChangeDate}
           style={styleHelper.forms.datePicker}
         />
       )}
 
-<View style={styleHelper.forms.buttonContainer}>
+      <View style={styleHelper.forms.buttonContainer}>
         <TouchableOpacity 
           style={styleHelper.forms.cancelButton}
           onPress={() => navigation.goBack()}
