@@ -8,14 +8,14 @@ export const DataProvider = ({ children }) => {
 
   const addActivity = (activity) => {
     const isSpecial = (activity.activityType === 'Running' || activity.activityType === 'Weights') && activity.duration > 60;
-    setActivities(prevActivities => [...prevActivities, { ...activity, isSpecial }]);
+    setActivities(prevActivities => [...prevActivities, { ...activity, isSpecial, id: Date.now() }]);
   };
 
   const addDietEntry = (entry) => {
     const isSpecial = entry.calories > 800;
-    setDietEntries(prevEntries => [...prevEntries, { ...entry, isSpecial }]);
+    setDietEntries(prevEntries => [...prevEntries, { ...entry, isSpecial, id: Date.now() }]);
   };
-
+  
   return (
     <DataContext.Provider value={{ activities, dietEntries, addActivity, addDietEntry }}>
       {children}

@@ -12,14 +12,6 @@ export default function ItemsList({ type }) {
 
   const data = type === 'activity' ? activities : dietEntries;
 
-  const isSpecial = (item) => {
-    if (type === 'activity') {
-      return (item.activityType === 'Running' || item.activityType === 'Weights') && item.duration > 60;
-    } else {
-      return item.calories > 800;
-    }
-  };
-
   const renderItem = ({ item }) => (
     <View style={[
       styleHelper.itemsList.item, 
@@ -29,7 +21,7 @@ export default function ItemsList({ type }) {
         <Text style={[styleHelper.itemsList.itemTitle, { color: themeColors.text }]}>
           {type === 'activity' ? item.activityType : item.description}
         </Text>
-        {isSpecial(item) && (
+        {item.isSpecial && (
           <Ionicons name="warning" size={20} color={themeColors.tabIcon} />
         )}
       </View>
@@ -48,7 +40,7 @@ export default function ItemsList({ type }) {
     <FlatList
       data={data}
       renderItem={renderItem}
-      keyExtractor={(item, index) => index.toString()}
+      keyExtractor={(item) => item.id.toString()}
       ListEmptyComponent={
         <Text style={[styleHelper.itemsList.emptyText, { color: themeColors.text }]}>
           No {type} entries yet.

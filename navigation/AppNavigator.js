@@ -11,13 +11,16 @@ import AddDietEntryScreen from '../screens/AddDietEntryScreen';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
+// Create navigator instances
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// MainTabs component: Defines the bottom tab navigation
 function MainTabs() {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
+  // Custom "Add" button for the header
   const addButton = (navigation, navigateTo) => (
     <TouchableOpacity
       onPress={() => navigation.navigate(navigateTo)}
@@ -35,6 +38,7 @@ function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        // Custom tab bar icon configuration
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'Activities') {
@@ -46,6 +50,7 @@ function MainTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        // Theme-based styling for tab bar and header
         tabBarActiveTintColor: themeColors.tabIcon,
         tabBarInactiveTintColor: themeColors.tabBarInactiveIcon,
         tabBarStyle: {
@@ -78,6 +83,7 @@ function MainTabs() {
   );
 }
 
+// AppNavigator: Root navigation component
 export default function AppNavigator() {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
@@ -91,11 +97,13 @@ export default function AppNavigator() {
         headerTintColor: themeColors.headerText,
       }}
     >
+      {/* Main tabs screen (nested navigation) */}
       <Stack.Screen 
         name="Main" 
         component={MainTabs} 
         options={{ headerShown: false }}
       />
+      {/* Additional screens for adding activities and diet entries */}
       <Stack.Screen name="AddActivity" component={AddActivityScreen} />
       <Stack.Screen name="AddDietEntry" component={AddDietEntryScreen} />
     </Stack.Navigator>
