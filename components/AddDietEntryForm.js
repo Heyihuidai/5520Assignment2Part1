@@ -7,17 +7,21 @@ import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
 export default function AddDietEntryForm() {
+  // State for form inputs
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  // Hooks for navigation, data management, and theming
   const navigation = useNavigation();
   const { addDietEntry } = useData();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
+  // Handle form submission
   const handleSave = () => {
+    // Validate inputs
     if (!description || !calories) {
       alert('Please fill in all fields');
       return;
@@ -29,6 +33,7 @@ export default function AddDietEntryForm() {
       return;
     }
 
+    // Create and save new diet entry
     const newEntry = {
       description,
       calories: caloriesNum,
@@ -40,6 +45,7 @@ export default function AddDietEntryForm() {
     navigation.goBack();
   };
 
+  // Handle date change
   const onChangeDate = (event, selectedDate) => {
     if (selectedDate) {
       setDate(selectedDate);
@@ -47,6 +53,7 @@ export default function AddDietEntryForm() {
     }
   };
 
+  // Format date for display
   const formatDate = (date) => {
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
@@ -54,6 +61,7 @@ export default function AddDietEntryForm() {
 
   return (
     <View style={styleHelper.forms.container}>
+      {/* Description input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Description *</Text>
       <TextInput
         style={[styleHelper.forms.input, { color: themeColors.text }]}
@@ -63,6 +71,7 @@ export default function AddDietEntryForm() {
         placeholderTextColor={themeColors.text}
       />
 
+      {/* Calories input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Calories *</Text>
       <TextInput
         style={[styleHelper.forms.input, { color: themeColors.text }]}
@@ -73,6 +82,7 @@ export default function AddDietEntryForm() {
         placeholderTextColor={themeColors.text}
       />
 
+      {/* Date picker */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
       <TouchableOpacity
         style={styleHelper.forms.dateInput}
@@ -90,6 +100,7 @@ export default function AddDietEntryForm() {
         />
       )}
 
+      {/* Form buttons */}
       <View style={styleHelper.forms.buttonContainer}>
         <TouchableOpacity 
           style={styleHelper.forms.cancelButton}

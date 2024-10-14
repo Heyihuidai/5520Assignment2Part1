@@ -8,9 +8,11 @@ import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
 export default function AddActivityForm() {
+  // State for dropdown picker
   const [open, setOpen] = useState(false);
   const [activityType, setActivityType] = useState(null);
   const [items, setItems] = useState([
+    /* Activity options */
     {label: 'Walking', value: 'Walking'},
     {label: 'Running', value: 'Running'},
     {label: 'Swimming', value: 'Swimming'},
@@ -20,16 +22,21 @@ export default function AddActivityForm() {
     {label: 'Hiking', value: 'Hiking'},
     {label: 'Other', value: 'Other'},
   ]);
+  
+  // State for form inputs
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  // Hooks for navigation, data management, and theming
   const navigation = useNavigation();
   const { addActivity } = useData();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
+  // Handle form submission
   const handleSave = () => {
+    // Validate inputs
     if (!activityType) {
       Alert.alert("Alert", "Please select an activity.");
       return;
@@ -39,6 +46,7 @@ export default function AddActivityForm() {
       return;
     }
 
+    // Create and save new activity
     const newActivity = {
       activityType,
       duration: parseInt(duration, 10),
@@ -53,12 +61,14 @@ export default function AddActivityForm() {
     }
   };
 
+  // Handle date change
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
     setDate(currentDate);
   };
 
+  // Format date for display
   const formatDate = (date) => {
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
@@ -66,8 +76,10 @@ export default function AddActivityForm() {
 
   return (
     <View style={styleHelper.forms.container}>
+      {/* Activity dropdown */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Activity *</Text>
       <DropDownPicker
+        /* DropDownPicker props */
         open={open}
         value={activityType}
         items={items}
@@ -83,8 +95,10 @@ export default function AddActivityForm() {
         ]}
       />
 
+      {/* Duration input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Duration (min) *</Text>
       <TextInput
+        /* TextInput props */
         style={[styleHelper.forms.input, { color: themeColors.text }]}
         value={duration}
         onChangeText={setDuration}
@@ -93,6 +107,7 @@ export default function AddActivityForm() {
         placeholderTextColor={themeColors.text}
       />
 
+      {/* Date picker */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
       <TouchableOpacity
         style={styleHelper.forms.dateInput}
@@ -102,6 +117,7 @@ export default function AddActivityForm() {
       </TouchableOpacity>
       {showDatePicker && (
         <DateTimePicker
+          /* DateTimePicker props */
           value={date}
           mode="date"
           display="default"
@@ -110,6 +126,7 @@ export default function AddActivityForm() {
         />
       )}
 
+      {/* Form buttons */}
       <View style={styleHelper.forms.buttonContainer}>
         <TouchableOpacity 
           style={styleHelper.forms.cancelButton}
