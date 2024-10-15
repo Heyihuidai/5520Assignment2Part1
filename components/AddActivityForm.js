@@ -120,9 +120,10 @@ export default function AddActivityForm() {
           /* DateTimePicker props */
           value={date}
           mode="date"
-          display="default"
+          display="inline"
           onChange={onChangeDate}
           style={styleHelper.forms.datePicker}
+
         />
       )}
 
