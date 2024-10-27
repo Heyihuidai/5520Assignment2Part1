@@ -1,5 +1,7 @@
+
+// AddDietEntryForm.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { useData } from '../context/DataContext';
@@ -12,6 +14,7 @@ export default function AddDietEntryForm() {
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hooks for navigation, data management, and theming
   const navigation = useNavigation();
@@ -20,29 +23,45 @@ export default function AddDietEntryForm() {
   const themeColors = getThemeColors(isDarkMode);
 
   // Handle form submission
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Prevent multiple submissions
+    if (isSubmitting) return;
+
     // Validate inputs
     if (!description || !calories) {
-      alert('Please fill in all fields');
+      Alert.alert("Alert", "Please fill in all fields");
       return;
     }
 
     const caloriesNum = parseInt(calories, 10);
     if (isNaN(caloriesNum) || caloriesNum < 0) {
-      alert('Please enter a valid number of calories');
+      Alert.alert("Alert", "Please enter a valid number of calories");
       return;
     }
 
-    // Create and save new diet entry
-    const newEntry = {
-      description,
-      calories: caloriesNum,
-      date: date.toISOString().split('T')[0],
-      isSpecial: caloriesNum > 800
-    };
+    try {
+      setIsSubmitting(true);
 
-    addDietEntry(newEntry);
-    navigation.goBack();
+      // Create and save new diet entry
+      const newEntry = {
+        description,
+        calories: caloriesNum,
+        date: date.toISOString().split('T')[0],
+      };
+
+      // Wait for the Firebase operation to complete
+      const success = await addDietEntry(newEntry);
+      
+      if (success) {
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", "Failed to add diet entry. Please try again.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Handle date change
@@ -105,14 +124,21 @@ export default function AddDietEntryForm() {
         <TouchableOpacity 
           style={styleHelper.forms.cancelButton}
           onPress={() => navigation.goBack()}
+          disabled={isSubmitting}
         >
           <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={styleHelper.forms.saveButton}
+          style={[
+            styleHelper.forms.saveButton,
+            isSubmitting && { opacity: 0.7 }
+          ]}
           onPress={handleSave}
+          disabled={isSubmitting}
         >
-          <Text style={styleHelper.forms.saveButtonText}>Save</Text>
+          <Text style={styleHelper.forms.saveButtonText}>
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

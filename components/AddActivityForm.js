@@ -1,3 +1,4 @@
+// AddActivityForm.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -12,7 +13,6 @@ export default function AddActivityForm() {
   const [open, setOpen] = useState(false);
   const [activityType, setActivityType] = useState(null);
   const [items, setItems] = useState([
-    /* Activity options */
     {label: 'Walking', value: 'Walking'},
     {label: 'Running', value: 'Running'},
     {label: 'Swimming', value: 'Swimming'},
@@ -27,6 +27,7 @@ export default function AddActivityForm() {
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hooks for navigation, data management, and theming
   const navigation = useNavigation();
@@ -35,7 +36,10 @@ export default function AddActivityForm() {
   const themeColors = getThemeColors(isDarkMode);
 
   // Handle form submission
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Prevent multiple submissions
+    if (isSubmitting) return;
+
     // Validate inputs
     if (!activityType) {
       Alert.alert("Alert", "Please select an activity.");
@@ -46,18 +50,28 @@ export default function AddActivityForm() {
       return;
     }
 
-    // Create and save new activity
-    const newActivity = {
-      activityType,
-      duration: parseInt(duration, 10),
-      date: date.toISOString().split('T')[0],
-    };
+    try {
+      setIsSubmitting(true);
+      
+      // Create and save new activity
+      const newActivity = {
+        activityType,
+        duration: parseInt(duration, 10),
+        date: date.toISOString().split('T')[0],
+      };
 
-    const success = addActivity(newActivity);
-    if (success) {
-      navigation.goBack();
-    } else {
-      Alert.alert("Alert", "Failed to add activity. Please try again.");
+      // Wait for the Firebase operation to complete
+      const success = await addActivity(newActivity);
+      
+      if (success) {
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", "Failed to add activity. Please try again.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -79,7 +93,6 @@ export default function AddActivityForm() {
       {/* Activity dropdown */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Activity *</Text>
       <DropDownPicker
-        /* DropDownPicker props */
         open={open}
         value={activityType}
         items={items}
@@ -98,7 +111,6 @@ export default function AddActivityForm() {
       {/* Duration input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Duration (min) *</Text>
       <TextInput
-        /* TextInput props */
         style={[styleHelper.forms.input, { color: themeColors.text }]}
         value={duration}
         onChangeText={setDuration}
@@ -117,14 +129,11 @@ export default function AddActivityForm() {
       </TouchableOpacity>
       {showDatePicker && (
         <DateTimePicker
-          /* DateTimePicker props */
           value={date}
           mode="date"
           display="inline"
           onChange={onChangeDate}
           style={styleHelper.forms.datePicker}
-          
-
         />
       )}
 
@@ -133,14 +142,21 @@ export default function AddActivityForm() {
         <TouchableOpacity 
           style={styleHelper.forms.cancelButton}
           onPress={() => navigation.goBack()}
+          disabled={isSubmitting}
         >
           <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={styleHelper.forms.saveButton}
+          style={[
+            styleHelper.forms.saveButton,
+            isSubmitting && { opacity: 0.7 }
+          ]}
           onPress={handleSave}
+          disabled={isSubmitting}
         >
-          <Text style={styleHelper.forms.saveButtonText}>Save</Text>
+          <Text style={styleHelper.forms.saveButtonText}>
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

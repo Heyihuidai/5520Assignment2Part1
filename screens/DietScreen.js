@@ -14,7 +14,7 @@ export default function DietScreen() {
 
   useEffect(() => {
     const unsubscribe = firestoreHelper.subscribeToCollection(
-      'diet',
+      'dietEntries',  // Changed from 'diet' to 'dietEntries' to match the collection name used in DataContext
       (updatedDiet) => {
         setDietItems(updatedDiet);
         setLoading(false);
@@ -35,7 +35,6 @@ export default function DietScreen() {
   const handleRetry = () => {
     setLoading(true);
     setError(null);
-    // The subscription will automatically retry
   };
 
   return (

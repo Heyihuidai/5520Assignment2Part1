@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,34 +11,39 @@ import AddDietEntryScreen from '../screens/AddDietEntryScreen';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
-// Create navigator instances
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// MainTabs component: Defines the bottom tab navigation
 function MainTabs() {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
-  // Custom "Add" button for the header
-  const addButton = (navigation, navigateTo) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate(navigateTo)}
-      style={styleHelper.header?.addButton || { marginRight: 15 }}
-    >
-      <Text style={[
-        styleHelper.header?.addButtonText || { fontSize: 16, fontWeight: 'bold' },
-        { color: themeColors.headerText }
-      ]}>
-        Add
-      </Text>
-    </TouchableOpacity>
+  // Modified header buttons with no spacing between icons
+  const headerButtons = (navigation, navigateTo, iconType) => (
+    <View style={{ flexDirection: 'row', marginRight: 15 }}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate(navigateTo)}
+        style={{ marginRight: 2 }}  // Minimal spacing just to prevent icons from touching
+      >
+        <Ionicons 
+          name="add"
+          size={24}
+          color={themeColors.headerText}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <Ionicons 
+          name={iconType === 'activity' ? 'fitness' : 'restaurant'}
+          size={24}
+          color={themeColors.headerText}
+        />
+      </TouchableOpacity>
+    </View>
   );
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        // Custom tab bar icon configuration
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'Activities') {
@@ -50,7 +55,6 @@ function MainTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        // Theme-based styling for tab bar and header
         tabBarActiveTintColor: themeColors.tabIcon,
         tabBarInactiveTintColor: themeColors.tabBarInactiveIcon,
         tabBarStyle: {
@@ -68,14 +72,14 @@ function MainTabs() {
         name="Activities" 
         component={ActivitiesScreen}
         options={({ navigation }) => ({
-          headerRight: () => addButton(navigation, 'AddActivity'),
+          headerRight: () => headerButtons(navigation, 'AddActivity', 'activity'),
         })}
       />
       <Tab.Screen 
         name="Diet" 
         component={DietScreen}
         options={({ navigation }) => ({
-          headerRight: () => addButton(navigation, 'AddDietEntry'),
+          headerRight: () => headerButtons(navigation, 'AddDietEntry', 'diet'),
         })}
       />
       <Tab.Screen name="Settings" component={SettingsScreen} />
@@ -83,7 +87,6 @@ function MainTabs() {
   );
 }
 
-// AppNavigator: Root navigation component
 export default function AppNavigator() {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
@@ -97,13 +100,11 @@ export default function AppNavigator() {
         headerTintColor: themeColors.headerText,
       }}
     >
-      {/* Main tabs screen (nested navigation) */}
       <Stack.Screen 
         name="Main" 
         component={MainTabs} 
         options={{ headerShown: false }}
       />
-      {/* Additional screens for adding activities and diet entries */}
       <Stack.Screen name="AddActivity" component={AddActivityScreen} />
       <Stack.Screen name="AddDietEntry" component={AddDietEntryScreen} />
     </Stack.Navigator>

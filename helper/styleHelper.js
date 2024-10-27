@@ -4,23 +4,29 @@ export const styleHelper = {
       primary: '#5e35b1',
       background: '#e6e1f2',
       text: '#000000',
+      textSecondary: '#666666',
+      textTertiary: '#999999',
       inputBackground: '#d3d3d3',
       headerText: '#ffffff',
       tabIcon: '#FFA500',
       tabBarBackground: '#5e35b1',
       tabBarInactiveIcon: 'rgba(255,165,0,0.7)',
       listItemBackground: '#d3d3d3',
+      warning: '#FFA500',
     },
     dark: {
       primary: '#5e35b1',
       background: '#121212',
       text: '#ffffff',
+      textSecondary: '#B3B3B3',
+      textTertiary: '#808080',
       inputBackground: '#2a2a2a',
       headerText: '#ffffff',
       tabIcon: '#FFA500',
       tabBarBackground: '#5e35b1',
       tabBarInactiveIcon: 'rgba(255,165,0,0.5)',
       listItemBackground: '#8B4513',
+      warning: '#FFA500',
     }
   },
   spacing: {
@@ -119,10 +125,10 @@ export const styleHelper = {
       borderRadius: 5,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#5e35b1', // Purple color
+      backgroundColor: '#5e35b1',
     },
     cancelButtonText: {
-      color: '#5e35b1', // Purple color
+      color: '#5e35b1',
       fontSize: 16,
       fontWeight: 'bold',
     },
@@ -197,17 +203,42 @@ export const styleHelper = {
       padding: 16,
       marginBottom: 8,
       borderRadius: 8,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 2,
     },
     itemHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       marginBottom: 8,
+    },
+    headerLeft: {
+      flex: 1,
     },
     itemTitle: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: 'white',
+      marginBottom: 4,
+    },
+    duration: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    calories: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    dateText: {
+      fontSize: 12,
+    },
+    alertIcon: {
+      marginLeft: 8,
     },
     itemDetails: {
       flexDirection: 'row',
@@ -215,13 +246,11 @@ export const styleHelper = {
     },
     itemText: {
       fontSize: 14,
-      color: 'white',
     },
     emptyText: {
       textAlign: 'center',
       marginTop: 32,
       fontSize: 16,
-      color: 'white',
     },
     errorText: {
       fontSize: 16,
