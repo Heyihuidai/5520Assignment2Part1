@@ -1,6 +1,5 @@
-// firebase/firebaseSetup.js
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentSingleTabManager } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB_SFBdjSj7RazoEaKfExZl7JPVzIuR08Y",
@@ -11,59 +10,33 @@ const firebaseConfig = {
   appId: "1:177984686736:web:e23388f4d03edec64ea615"
 };
 
+// Initialize Firebase with logging
 let app;
 let db;
 
-const initializeFirebase = async () => {
-  try {
-    console.log('📌 Project ID:', firebaseConfig.projectId);
-    console.log('🔧 Firebase Apps:', getApps().length);
+try {
+  console.log('🔥 Initializing Firebase...');
+  app = initializeApp(firebaseConfig);
+  console.log('✅ Firebase initialized successfully');
 
-    // Initialize Firebase app
-    if (getApps().length === 0) {
-      app = initializeApp(firebaseConfig);
-      console.log('🆕 Created new Firebase app');
-    } else {
-      app = getApp();
-      console.log('♻️ Retrieved existing Firebase app');
-    }
+  console.log('📚 Initializing Firestore...');
+  // Initialize Firestore with mobile-optimized settings
+  db = initializeFirestore(app, {
+    experimentalForceLongPolling: true, // This helps with React Native
+    useFetchStreams: false, // Better compatibility with React Native
+  });
+  
+  console.log('✅ Firestore initialized successfully', {
+    projectId: db?._databaseId?.projectId
+  });
 
-    // Initialize Firestore
-    db = getFirestore(app);
-    
-    // Enable offline persistence
-    try {
-      await enableIndexedDbPersistence(db);
-      console.log('📱 Offline persistence enabled');
-    } catch (err) {
-      if (err.code === 'failed-precondition') {
-        console.warn('⚠️ Multiple tabs open, persistence can only be enabled in one tab at a time.');
-      } else if (err.code === 'unimplemented') {
-        console.warn('⚠️ The current browser doesn\'t support persistence.');
-      }
-    }
+} catch (error) {
+  console.error('❌ Error initializing Firebase:', error);
+  throw error;
+}
 
-    console.log('✅ Firestore initialized successfully');
-    return { app, db };
-  } catch (error) {
-    console.error('❌ Firebase initialization error:', error);
-    throw error;
-  }
-};
+if (!db) {
+  throw new Error('Firestore failed to initialize properly');
+}
 
-// Initialize Firebase immediately
-const firebaseInstance = initializeFirebase();
-
-// Export a function to get the initialized instances
-export const getFirebaseInstances = async () => {
-  try {
-    const instances = await firebaseInstance;
-    if (!instances.db) {
-      throw new Error('Firestore instance not initialized');
-    }
-    return instances;
-  } catch (error) {
-    console.error('Failed to get Firebase instances:', error);
-    throw error;
-  }
-};
+export { db, app };

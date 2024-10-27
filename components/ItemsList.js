@@ -8,7 +8,6 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
-  // Handle error state
   if (error) {
     return (
       <View style={[styleHelper.itemsList.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -29,7 +28,6 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
     );
   }
 
-  // Handle loading state
   if (loading) {
     return (
       <View style={[styleHelper.itemsList.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -45,7 +43,7 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
     ]}>
       <View style={styleHelper.itemsList.itemHeader}>
         <Text style={[styleHelper.itemsList.itemTitle, { color: themeColors.text }]}>
-          {type === 'activity' ? item.activityType : item.description}
+          {type === 'activity' ? item.name : item.name}
         </Text>
         {item.isSpecial && (
           <Ionicons name="warning" size={20} color={themeColors.tabIcon} />
@@ -55,8 +53,8 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
         <Text style={[styleHelper.itemsList.itemText, { color: themeColors.text }]}>
           {type === 'activity' ? `${item.duration} min` : `${item.calories} cal`}
         </Text>
-        <Text style={[styleHelper.itemsList.itemText, { color: themeColors.text }]}>
-          {item.date}
+        <Text style={[styleHelper.itemsList.itemDescription, { color: themeColors.text }]}>
+          {item.description}
         </Text>
       </View>
     </View>
@@ -66,7 +64,7 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
     <FlatList
       data={data}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       contentContainerStyle={{
         marginTop: styleHelper.spacing.medium,
         marginHorizontal: styleHelper.spacing.medium,
