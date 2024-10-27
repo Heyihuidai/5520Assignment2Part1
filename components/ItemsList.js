@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 import { format } from 'date-fns';
 
 export default function ItemsList({ type, data, loading, error, onRetry }) {
+  const navigation = useNavigation();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
@@ -37,15 +39,21 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
     );
   }
 
+  const handleItemPress = (item) => {
+    if (type === 'activity') {
+      navigation.navigate('EditActivity', { activity: item });
+    } else {
+      navigation.navigate('EditDietEntry', { entry: item });
+    }
+  };
+
   const renderItem = ({ item }) => {
-    // Format the date with better error handling
     let formattedDate = 'Date not available';
     try {
-      if (item.createdAt) {
-        // Handle both Firestore Timestamp and regular date objects
-        const date = item.createdAt.toDate ? item.createdAt.toDate() : new Date(item.createdAt);
+      if (item.date) {
+        const date = new Date(item.date);
         if (!isNaN(date.getTime())) {
-          formattedDate = format(date, 'MMM dd, yyyy HH:mm');
+          formattedDate = format(date, 'MMM dd, yyyy');
         }
       }
     } catch (error) {
@@ -53,10 +61,13 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
     }
 
     return (
-      <View style={[
-        styleHelper.itemsList.item, 
-        { backgroundColor: themeColors.listItemBackground }
-      ]}>
+      <TouchableOpacity 
+        onPress={() => handleItemPress(item)}
+        style={[
+          styleHelper.itemsList.item, 
+          { backgroundColor: themeColors.listItemBackground }
+        ]}
+      >
         <View style={styleHelper.itemsList.itemHeader}>
           <View style={styleHelper.itemsList.headerLeft}>
             {type === 'activity' ? (
@@ -99,7 +110,7 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
             {formattedDate}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

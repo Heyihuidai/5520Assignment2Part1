@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import { firestoreHelper } from '../firebase/firestoreHelper';
+import { subscribeToActivities } from '../firebase/firestoreOperations';
 import ItemsList from '../components/ItemsList';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
@@ -13,19 +13,15 @@ export default function ActivitiesScreen() {
   const themeColors = getThemeColors(isDarkMode);
 
   useEffect(() => {
-    const unsubscribe = firestoreHelper.subscribeToCollection(
-      'activities',
+    const unsubscribe = subscribeToActivities(
       (updatedActivities) => {
         setActivities(updatedActivities);
         setLoading(false);
       },
       (error) => {
-        setError(error.message);
+        console.error('Activities fetch error:', error);
+        setError('Failed to load activities. Please try again.');
         setLoading(false);
-      },
-      {
-        orderBy: 'createdAt',
-        orderDirection: 'desc'
       }
     );
 

@@ -1,14 +1,14 @@
-// AddActivityForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Checkbox from 'expo-checkbox';
 import { useNavigation } from '@react-navigation/native';
-import { useData } from '../context/DataContext';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
+import { addActivity, updateActivity } from '../firebase/firestoreOperations';
 
-export default function AddActivityForm() {
+export default function AddActivityForm({ initialData, isEditing }) {
   // State for dropdown picker
   const [open, setOpen] = useState(false);
   const [activityType, setActivityType] = useState(null);
@@ -28,12 +28,22 @@ export default function AddActivityForm() {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(false);
 
-  // Hooks for navigation, data management, and theming
+  // Hooks for navigation and theming
   const navigation = useNavigation();
-  const { addActivity } = useData();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
+
+  // Initialize form with existing data when editing
+  useEffect(() => {
+    if (initialData) {
+      setActivityType(initialData.activityType);
+      setDuration(initialData.duration.toString());
+      setDate(new Date(initialData.date));
+      setIsSpecial(initialData.isSpecial || false);
+    }
+  }, [initialData]);
 
   // Handle form submission
   const handleSave = async () => {
@@ -53,22 +63,27 @@ export default function AddActivityForm() {
     try {
       setIsSubmitting(true);
       
-      // Create and save new activity
-      const newActivity = {
+      const activityData = {
         activityType,
         duration: parseInt(duration, 10),
         date: date.toISOString().split('T')[0],
+        isSpecial,
       };
 
-      // Wait for the Firebase operation to complete
-      const success = await addActivity(newActivity);
+      let success;
+      if (isEditing) {
+        success = await updateActivity(initialData.id, activityData);
+      } else {
+        success = await addActivity(activityData);
+      }
       
       if (success) {
         navigation.goBack();
       } else {
-        Alert.alert("Error", "Failed to add activity. Please try again.");
+        Alert.alert("Error", `Failed to ${isEditing ? 'update' : 'add'} activity. Please try again.`);
       }
     } catch (error) {
+      console.error(`Error ${isEditing ? 'updating' : 'adding'} activity:`, error);
       Alert.alert("Error", "An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -137,6 +152,20 @@ export default function AddActivityForm() {
         />
       )}
 
+      {/* Special checkbox (only shown in edit mode) */}
+      {isEditing && (
+        <View style={styleHelper.forms.checkboxContainer}>
+          <Checkbox
+            value={isSpecial}
+            onValueChange={setIsSpecial}
+            style={styleHelper.forms.checkbox}
+          />
+          <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
+            Mark as Special
+          </Text>
+        </View>
+      )}
+
       {/* Form buttons */}
       <View style={styleHelper.forms.buttonContainer}>
         <TouchableOpacity 
@@ -155,7 +184,7 @@ export default function AddActivityForm() {
           disabled={isSubmitting}
         >
           <Text style={styleHelper.forms.saveButtonText}>
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
           </Text>
         </TouchableOpacity>
       </View>

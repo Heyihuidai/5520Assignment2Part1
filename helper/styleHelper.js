@@ -137,6 +137,17 @@ export const styleHelper = {
       fontSize: 16,
       fontWeight: 'bold',
     },
+    checkboxContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+    checkbox: {
+      marginRight: 10,
+    },
+    checkboxLabel: {
+      fontSize: 16,
+    },
   },
   screens: {
     container: {

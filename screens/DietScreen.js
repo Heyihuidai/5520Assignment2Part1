@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import { firestoreHelper } from '../firebase/firestoreHelper';
+import { subscribeToDietEntries } from '../firebase/firestoreOperations';
 import ItemsList from '../components/ItemsList';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
@@ -14,7 +14,7 @@ export default function DietScreen() {
 
   useEffect(() => {
     const unsubscribe = firestoreHelper.subscribeToCollection(
-      'dietEntries',  // Changed from 'diet' to 'dietEntries' to match the collection name used in DataContext
+      'dietEntries',
       (updatedDiet) => {
         setDietItems(updatedDiet);
         setLoading(false);

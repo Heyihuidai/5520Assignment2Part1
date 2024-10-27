@@ -8,6 +8,8 @@ import DietScreen from '../screens/DietScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AddActivityScreen from '../screens/AddActivityScreen';
 import AddDietEntryScreen from '../screens/AddDietEntryScreen';
+import EditActivityScreen from '../screens/EditActivityScreen';
+import EditDietEntryScreen from '../screens/EditDietEntryScreen';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
@@ -107,6 +109,8 @@ export default function AppNavigator() {
       />
       <Stack.Screen name="AddActivity" component={AddActivityScreen} />
       <Stack.Screen name="AddDietEntry" component={AddDietEntryScreen} />
+      <Stack.Screen name="EditActivity" component={EditActivityScreen} />
+      <Stack.Screen name="EditDietEntry" component={EditDietEntryScreen} />
     </Stack.Navigator>
   );
 }

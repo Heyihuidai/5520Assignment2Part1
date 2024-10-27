@@ -1,26 +1,35 @@
-
-// AddDietEntryForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import { useData } from '../context/DataContext';
+import Checkbox from 'expo-checkbox';
+import { addDietEntry, updateDietEntry } from '../firebase/firestoreOperations'
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
-export default function AddDietEntryForm() {
+export default function AddDietEntryForm({ initialData, isEditing }) {
   // State for form inputs
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(false);
 
   // Hooks for navigation, data management, and theming
   const navigation = useNavigation();
-  const { addDietEntry } = useData();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
+
+  // Initialize form with existing data when editing
+  useEffect(() => {
+    if (initialData) {
+      setDescription(initialData.description);
+      setCalories(initialData.calories.toString());
+      setDate(new Date(initialData.date));
+      setIsSpecial(initialData.isSpecial || false);
+    }
+  }, [initialData]);
 
   // Handle form submission
   const handleSave = async () => {
@@ -42,20 +51,24 @@ export default function AddDietEntryForm() {
     try {
       setIsSubmitting(true);
 
-      // Create and save new diet entry
-      const newEntry = {
+      const entryData = {
         description,
         calories: caloriesNum,
         date: date.toISOString().split('T')[0],
+        isSpecial,
       };
 
-      // Wait for the Firebase operation to complete
-      const success = await addDietEntry(newEntry);
+      let success;
+      if (isEditing) {
+        success = await updateDietEntry(initialData.id, entryData);
+      } else {
+        success = await addDietEntry(entryData);
+      }
       
       if (success) {
         navigation.goBack();
       } else {
-        Alert.alert("Error", "Failed to add diet entry. Please try again.");
+        Alert.alert("Error", `Failed to ${isEditing ? 'update' : 'add'} diet entry. Please try again.`);
       }
     } catch (error) {
       Alert.alert("Error", "An unexpected error occurred. Please try again.");
@@ -119,6 +132,20 @@ export default function AddDietEntryForm() {
         />
       )}
 
+      {/* Special checkbox (only shown in edit mode) */}
+      {isEditing && (
+        <View style={styleHelper.forms.checkboxContainer}>
+          <Checkbox
+            value={isSpecial}
+            onValueChange={setIsSpecial}
+            style={styleHelper.forms.checkbox}
+          />
+          <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
+            Mark as Special
+          </Text>
+        </View>
+      )}
+
       {/* Form buttons */}
       <View style={styleHelper.forms.buttonContainer}>
         <TouchableOpacity 
@@ -137,7 +164,7 @@ export default function AddDietEntryForm() {
           disabled={isSubmitting}
         >
           <Text style={styleHelper.forms.saveButtonText}>
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
           </Text>
         </TouchableOpacity>
       </View>
