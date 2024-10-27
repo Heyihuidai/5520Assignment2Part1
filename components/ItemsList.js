@@ -1,20 +1,24 @@
 import React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useData } from '../context/DataContext';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
 // ItemsList: A reusable component to display a list of activities or diet entries
-export default function ItemsList({ type }) {
-  // Fetch data from DataContext
-  const { activities, dietEntries } = useData();
+export default function ItemsList({ type, data, loading }) {
   // Get current theme mode
   const { isDarkMode } = useTheme();
   // Get theme colors based on current mode
   const themeColors = getThemeColors(isDarkMode);
-  // Select data based on the 'type' prop
-  const data = type === 'activity' ? activities : dietEntries;
+
+  // Add loading state handling
+  if (loading) {
+    return (
+      <View style={[styleHelper.itemsList.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={themeColors.tabIcon} />
+      </View>
+    );
+  }
 
   // Render individual list item
   const renderItem = ({ item }) => (

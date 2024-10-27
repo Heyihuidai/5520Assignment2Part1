@@ -190,8 +190,8 @@ export const styleHelper = {
   },
   itemsList: {
     container: {
-      marginTop: styleHelper.spacing.medium,
-      marginHorizontal: styleHelper.spacing.medium,
+      marginTop: 16,
+      marginHorizontal: 16,
     },
     item: {
       padding: 16,
