@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View } from 'react-native';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '../firebase/firebaseSetup';
+import { View, Text, Alert } from 'react-native';
+import { activitiesHelper } from '../firebase/firestoreHelper';
 import ItemsList from '../components/ItemsList';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
@@ -9,54 +8,80 @@ import { styleHelper, getThemeColors } from '../helper/styleHelper';
 export default function ActivitiesScreen() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
   useEffect(() => {
-    console.log('🔵 Setting up activities listener...'); // Debug log
-    
-    const activitiesRef = collection(db, 'activities');
-    const q = query(activitiesRef, orderBy('createdAt', 'desc'));
+    let isMounted = true;
 
-    // Set up realtime listener
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      console.log('📥 Received activities update:', snapshot.docs.length, 'documents'); // Debug log
-      
-      const activitiesData = [];
-      snapshot.forEach((doc) => {
-        console.log(`📄 Document ${doc.id}:`, doc.data()); // Debug log for each document
-        activitiesData.push({
-          id: doc.id,
-          ...doc.data()
-        });
-      });
+    const initializeActivities = async () => {
+      try {
+        console.log('🚀 Initializing activities subscription...');
+        
+        const unsubscribe = await activitiesHelper.subscribeToActivities(
+          (updatedActivities) => {
+            if (isMounted) {
+              console.log('📦 Received activities update:', updatedActivities.length);
+              setActivities(updatedActivities);
+              setLoading(false);
+            }
+          },
+          (error) => {
+            if (isMounted) {
+              const errorMsg = `Failed to load activities: ${error.message}`;
+              console.error('❌', errorMsg);
+              setError(errorMsg);
+              setLoading(false);
+              Alert.alert('Error', errorMsg);
+            }
+          }
+        );
 
-      console.log('📋 Full activities data:', activitiesData); // Debug log for final data
-      setActivities(activitiesData);
-      setLoading(false);
-    }, (error) => {
-      console.error('❌ Error fetching activities:', error); // Debug log for errors
-      setLoading(false);
-    });
+        return unsubscribe;
+      } catch (error) {
+        if (isMounted) {
+          const errorMsg = `Failed to initialize activities: ${error.message}`;
+          console.error('❌', errorMsg);
+          setError(errorMsg);
+          setLoading(false);
+          Alert.alert('Error', errorMsg);
+        }
+        return () => {}; // Return empty cleanup function in case of error
+      }
+    };
 
-    // Cleanup subscription
+    const cleanup = initializeActivities();
+
     return () => {
-      console.log('🔴 Cleaning up activities listener'); // Debug log for cleanup
-      unsubscribe();
+      isMounted = false;
+      cleanup.then(unsubscribe => {
+        if (unsubscribe) {
+          console.log('🧹 Cleaning up activities subscription');
+          unsubscribe();
+        }
+      });
     };
   }, []);
 
-  // Debug log when activities state updates
-  useEffect(() => {
-    console.log('📊 Activities state updated:', activities.length, 'items'); // Debug log for state updates
-  }, [activities]);
+  // Render error state
+  if (error) {
+    return (
+      <View style={[styleHelper.screens.container, { backgroundColor: themeColors.background }]}>
+        <Text style={{ color: themeColors.error, padding: 16, textAlign: 'center' }}>
+          {error}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styleHelper.screens.container, { backgroundColor: themeColors.background }]}>
-      <ItemsList 
-        type="activity" 
-        data={activities} 
-        loading={loading} 
+      <ItemsList
+        type="activity"
+        data={activities}
+        loading={loading}
+        error={error}
       />
     </View>
   );

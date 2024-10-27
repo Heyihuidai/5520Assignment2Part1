@@ -223,6 +223,20 @@ export const styleHelper = {
       fontSize: 16,
       color: 'white',
     },
+    errorText: {
+      fontSize: 16,
+      textAlign: 'center',
+      marginHorizontal: 20,
+    },
+    retryButton: {
+      marginTop: 10,
+      padding: 10,
+      borderRadius: 5,
+    },
+    retryText: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
   },
   modal: {
     centeredView: {
