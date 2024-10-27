@@ -31,29 +31,14 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
     }
   }, [initialData]);
 
-  // Handle form submission
-  const handleSave = async () => {
-    // Prevent multiple submissions
-    if (isSubmitting) return;
-
-    // Validate inputs
-    if (!description || !calories) {
-      Alert.alert("Alert", "Please fill in all fields");
-      return;
-    }
-
-    const caloriesNum = parseInt(calories, 10);
-    if (isNaN(caloriesNum) || caloriesNum < 0) {
-      Alert.alert("Alert", "Please enter a valid number of calories");
-      return;
-    }
-
+  // Process form submission
+  const processSubmission = async () => {
     try {
       setIsSubmitting(true);
 
       const entryData = {
         description,
-        calories: caloriesNum,
+        calories: parseInt(calories, 10),
         date: date.toISOString().split('T')[0],
         isSpecial,
       };
@@ -71,9 +56,47 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         Alert.alert("Error", `Failed to ${isEditing ? 'update' : 'add'} diet entry. Please try again.`);
       }
     } catch (error) {
+      console.error(`Error ${isEditing ? 'updating' : 'adding'} diet entry:`, error);
       Alert.alert("Error", "An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Handle form submission with confirmation for updates
+  const handleSave = async () => {
+    if (isSubmitting) return;
+
+    // Validate inputs
+    if (!description || !calories) {
+      Alert.alert("Alert", "Please fill in all fields");
+      return;
+    }
+
+    const caloriesNum = parseInt(calories, 10);
+    if (isNaN(caloriesNum) || caloriesNum < 0) {
+      Alert.alert("Alert", "Please enter a valid number of calories");
+      return;
+    }
+
+    if (isEditing) {
+      Alert.alert(
+        "Important",
+        "Are you sure you want to save these changes?",
+        [
+          { 
+            text: "No", 
+            style: "cancel" 
+          },
+          { 
+            text: "Yes",
+            onPress: processSubmission
+          }
+        ],
+        { cancelable: false }
+      );
+    } else {
+      await processSubmission();
     }
   };
 

@@ -45,21 +45,8 @@ export default function AddActivityForm({ initialData, isEditing }) {
     }
   }, [initialData]);
 
-  // Handle form submission
-  const handleSave = async () => {
-    // Prevent multiple submissions
-    if (isSubmitting) return;
-
-    // Validate inputs
-    if (!activityType) {
-      Alert.alert("Alert", "Please select an activity.");
-      return;
-    }
-    if (!duration || isNaN(duration) || parseInt(duration, 10) <= 0) {
-      Alert.alert("Alert", "Please enter a valid duration (greater than 0).");
-      return;
-    }
-
+  // Process form submission
+  const processSubmission = async () => {
     try {
       setIsSubmitting(true);
       
@@ -90,6 +77,40 @@ export default function AddActivityForm({ initialData, isEditing }) {
     }
   };
 
+  // Handle form submission with confirmation for updates
+  const handleSave = async () => {
+    if (isSubmitting) return;
+
+    if (!activityType) {
+      Alert.alert("Alert", "Please select an activity.");
+      return;
+    }
+    if (!duration || isNaN(duration) || parseInt(duration, 10) <= 0) {
+      Alert.alert("Alert", "Please enter a valid duration (greater than 0).");
+      return;
+    }
+
+    if (isEditing) {
+      Alert.alert(
+        "Important",
+        "Are you sure you want to save these changes?",
+        [
+          { 
+            text: "No", 
+            style: "cancel" 
+          },
+          { 
+            text: "Yes",
+            onPress: processSubmission
+          }
+        ],
+        { cancelable: false }
+      );
+    } else {
+      await processSubmission();
+    }
+  };
+
   // Handle date change
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -105,7 +126,6 @@ export default function AddActivityForm({ initialData, isEditing }) {
 
   return (
     <View style={styleHelper.forms.container}>
-      {/* Activity dropdown */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Activity *</Text>
       <DropDownPicker
         open={open}
@@ -123,7 +143,6 @@ export default function AddActivityForm({ initialData, isEditing }) {
         ]}
       />
 
-      {/* Duration input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Duration (min) *</Text>
       <TextInput
         style={[styleHelper.forms.input, { color: themeColors.text }]}
@@ -134,7 +153,6 @@ export default function AddActivityForm({ initialData, isEditing }) {
         placeholderTextColor={themeColors.text}
       />
 
-      {/* Date picker */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
       <TouchableOpacity
         style={styleHelper.forms.dateInput}
@@ -152,7 +170,6 @@ export default function AddActivityForm({ initialData, isEditing }) {
         />
       )}
 
-      {/* Special checkbox (only shown in edit mode) */}
       {isEditing && (
         <View style={styleHelper.forms.checkboxContainer}>
           <Checkbox
@@ -166,7 +183,6 @@ export default function AddActivityForm({ initialData, isEditing }) {
         </View>
       )}
 
-      {/* Form buttons */}
       <View style={styleHelper.forms.buttonContainer}>
         <TouchableOpacity 
           style={styleHelper.forms.cancelButton}

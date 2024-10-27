@@ -13,8 +13,7 @@ export default function DietScreen() {
   const themeColors = getThemeColors(isDarkMode);
 
   useEffect(() => {
-    const unsubscribe = firestoreHelper.subscribeToCollection(
-      'dietEntries',
+    const unsubscribe = subscribeToDietEntries(
       (updatedDiet) => {
         setDietItems(updatedDiet);
         setLoading(false);
@@ -22,10 +21,6 @@ export default function DietScreen() {
       (error) => {
         setError(error.message);
         setLoading(false);
-      },
-      {
-        orderBy: 'createdAt',
-        orderDirection: 'desc'
       }
     );
 
