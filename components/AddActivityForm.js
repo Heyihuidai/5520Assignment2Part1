@@ -123,6 +123,7 @@ export default function AddActivityForm() {
           display="inline"
           onChange={onChangeDate}
           style={styleHelper.forms.datePicker}
+          
 
         />
       )}

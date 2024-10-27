@@ -50,6 +50,10 @@ export default function ItemsList({ type }) {
       data={data}
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}
+      contentContainerStyle={{
+        marginTop: styleHelper.spacing.medium,
+        marginHorizontal: styleHelper.spacing.medium,
+      }}
       ListEmptyComponent={
         // Display message when list is empty
         <Text style={[styleHelper.itemsList.emptyText, { color: themeColors.text }]}>
