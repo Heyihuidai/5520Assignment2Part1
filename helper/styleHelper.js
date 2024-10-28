@@ -316,6 +316,81 @@ export const styleHelper = {
       fontSize: 16,
     }
   },
+  buttons: {
+    base: {
+      padding: 10,
+      borderRadius: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: '45%',
+    },
+    variants: {
+      primary: {
+        backgroundColor: '#5e35b1',
+      },
+      primaryPressed: {
+        backgroundColor: '#4a2b8f',
+        opacity: 0.7,
+      },
+      secondary: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: '#5e35b1',
+      },
+      secondaryPressed: {
+        backgroundColor: 'rgba(94, 53, 177, 0.1)',
+        opacity: 0.7,
+      },
+      danger: {
+        backgroundColor: '#DC3545',
+      },
+      dangerPressed: {
+        backgroundColor: '#bd2130',
+        opacity: 0.7,
+      },
+    },
+    states: {
+      disabled: {
+        opacity: 0.5,
+      },
+    },
+    text: {
+      base: {
+        fontSize: 16,
+        fontWeight: 'bold',
+      },
+      primary: {
+        color: '#FFFFFF',
+      },
+      secondary: {
+        color: '#5e35b1',
+      },
+      danger: {
+        color: '#FFFFFF',
+      },
+      disabled: {
+        color: '#999999',
+      },
+    },
+    icon: {
+      base: {
+        padding: 8,
+        borderRadius: 20,
+      },
+      pressed: {
+        opacity: 0.7,
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+      },
+      disabled: {
+        opacity: 0.5,
+      },
+      ripple: {
+        color: 'rgba(0, 0, 0, 0.2)',
+        borderless: true,
+        radius: 20,
+      },
+    },
+  },
 };
 
 export const getThemeColors = (isDarkMode) => {
