@@ -27,6 +27,7 @@ export default function AddActivityForm({ initialData, isEditing }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSpecial, setIsSpecial] = useState(false);
+  const [wasInitiallySpecial, setWasInitiallySpecial] = useState(false);
 
   const navigation = useNavigation();
   const { isDarkMode } = useTheme();
@@ -37,9 +38,49 @@ export default function AddActivityForm({ initialData, isEditing }) {
       setActivityType(initialData.activityType);
       setDuration(initialData.duration.toString());
       setDate(new Date(initialData.date));
-      setIsSpecial(initialData.isSpecial || false);
+      if (initialData.isSpecial === true) {
+        setIsSpecial(true);
+        setWasInitiallySpecial(true);
+      }
     }
   }, [initialData]);
+
+  const handleSpecialChange = async (newValue) => {
+    console.log('Checkbox changed. New value:', newValue);
+    console.log('Current isSpecial state:', isSpecial);
+    console.log('Initial data:', initialData);
+    
+    setIsSpecial(newValue);
+    
+    // If we're unchecking the special status, update immediately in Firestore
+    if (!newValue && isEditing && initialData?.id) {
+      console.log('Attempting to update Firestore - removing special status');
+      try {
+        setIsSubmitting(true);
+        const updatedData = {
+          ...initialData,
+          isSpecial: false
+        };
+        console.log('Data being sent to Firestore:', updatedData);
+        
+        const success = await updateActivity(initialData.id, updatedData);
+        console.log('Firestore update result:', success);
+        
+        if (!success) {
+          console.log('Update failed, reverting checkbox');
+          setIsSpecial(true);
+          Alert.alert("Error", "Failed to update special status. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error updating special status:", error);
+        console.log('Error occurred, reverting checkbox');
+        setIsSpecial(true);
+        Alert.alert("Error", "An unexpected error occurred. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
 
   const processSubmission = async () => {
     try {
@@ -49,7 +90,8 @@ export default function AddActivityForm({ initialData, isEditing }) {
         activityType,
         duration: parseInt(duration, 10),
         date: date.toISOString().split('T')[0],
-        isSpecial,
+        isSpecial, // This will be false if checkbox is unchecked
+        lastUpdated: new Date().toISOString(), // Add this to trigger a UI refresh
       };
 
       let success;
@@ -166,16 +208,23 @@ export default function AddActivityForm({ initialData, isEditing }) {
         />
       )}
 
-      {isEditing && (
+      {isEditing && wasInitiallySpecial && (
         <View style={styleHelper.forms.checkboxContainer}>
           <Checkbox
             value={isSpecial}
-            onValueChange={setIsSpecial}
+            onValueChange={handleSpecialChange}
             style={styleHelper.forms.checkbox}
+            color={isSpecial ? themeColors.primary : undefined}
+            disabled={isSubmitting}
           />
-          <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
-            Mark as Special
-          </Text>
+          <Pressable 
+            onPress={() => !isSubmitting && handleSpecialChange(!isSpecial)}
+            style={styleHelper.forms.checkboxLabelContainer}
+          >
+            <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
+              Keep Special Status
+            </Text>
+          </Pressable>
         </View>
       )}
 
