@@ -8,30 +8,68 @@ import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 
 export default function AddDietEntryForm({ initialData, isEditing }) {
-  // State for form inputs
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSpecial, setIsSpecial] = useState(false);
+  const [wasInitiallySpecial, setWasInitiallySpecial] = useState(false);
 
-  // Hooks for navigation, data management, and theming
   const navigation = useNavigation();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
-  // Initialize form with existing data when editing
   useEffect(() => {
     if (initialData) {
       setDescription(initialData.description);
       setCalories(initialData.calories.toString());
       setDate(new Date(initialData.date));
-      setIsSpecial(initialData.isSpecial || false);
+      if (initialData.isSpecial === true) {
+        setIsSpecial(true);
+        setWasInitiallySpecial(true);
+      }
     }
   }, [initialData]);
 
-  // Process form submission
+  const handleSpecialChange = async (newValue) => {
+    console.log('Checkbox changed. New value:', newValue);
+    console.log('Current isSpecial state:', isSpecial);
+    console.log('Initial data:', initialData);
+    
+    setIsSpecial(newValue);
+    
+    // If we're unchecking the special status, update immediately in Firestore
+    if (!newValue && isEditing && initialData?.id) {
+      console.log('Attempting to update Firestore - removing special status');
+      try {
+        setIsSubmitting(true);
+        const updatedData = {
+          ...initialData,
+          isSpecial: false,
+          lastUpdated: new Date().toISOString(), // Add this to trigger a UI refresh
+        };
+        console.log('Data being sent to Firestore:', updatedData);
+        
+        const success = await updateDietEntry(initialData.id, updatedData);
+        console.log('Firestore update result:', success);
+        
+        if (!success) {
+          console.log('Update failed, reverting checkbox');
+          setIsSpecial(true);
+          Alert.alert("Error", "Failed to update special status. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error updating special status:", error);
+        console.log('Error occurred, reverting checkbox');
+        setIsSpecial(true);
+        Alert.alert("Error", "An unexpected error occurred. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
   const processSubmission = async () => {
     try {
       setIsSubmitting(true);
@@ -41,6 +79,7 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         calories: parseInt(calories, 10),
         date: date.toISOString().split('T')[0],
         isSpecial,
+        lastUpdated: new Date().toISOString(), // Add this to trigger a UI refresh
       };
 
       let success;
@@ -63,11 +102,9 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
     }
   };
 
-  // Handle form submission with confirmation for updates
   const handleSave = async () => {
     if (isSubmitting) return;
 
-    // Validate inputs
     if (!description || !calories) {
       Alert.alert("Alert", "Please fill in all fields");
       return;
@@ -100,7 +137,6 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
     }
   };
 
-  // Handle date change
   const onChangeDate = (event, selectedDate) => {
     if (selectedDate) {
       setDate(selectedDate);
@@ -108,7 +144,6 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
     }
   };
 
-  // Format date for display
   const formatDate = (date) => {
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
@@ -116,7 +151,6 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
 
   return (
     <View style={styleHelper.forms.container}>
-      {/* Description input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Description *</Text>
       <TextInput
         style={[styleHelper.forms.input, { color: themeColors.text }]}
@@ -126,7 +160,6 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         placeholderTextColor={themeColors.text}
       />
 
-      {/* Calories input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Calories *</Text>
       <TextInput
         style={[styleHelper.forms.input, { color: themeColors.text }]}
@@ -137,7 +170,6 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         placeholderTextColor={themeColors.text}
       />
 
-      {/* Date picker */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
       <Pressable
         style={({ pressed }) => [
@@ -159,27 +191,31 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         />
       )}
 
-      {/* Special checkbox (only shown in edit mode) */}
-      {isEditing && (
+      {isEditing && wasInitiallySpecial && (
         <View style={styleHelper.forms.checkboxContainer}>
           <Checkbox
             value={isSpecial}
-            onValueChange={setIsSpecial}
+            onValueChange={handleSpecialChange}
             style={styleHelper.forms.checkbox}
+            color={isSpecial ? themeColors.primary : undefined}
+            disabled={isSubmitting}
           />
-          <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
-            Mark as Special
-          </Text>
+          <Pressable 
+            onPress={() => !isSubmitting && handleSpecialChange(!isSpecial)}
+            style={styleHelper.forms.checkboxLabelContainer}
+          >
+            <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
+              Keep Special Status
+            </Text>
+          </Pressable>
         </View>
       )}
 
-      {/* Form buttons */}
       <View style={styleHelper.forms.buttonContainer}>
         <Pressable 
           style={({ pressed }) => [
             styleHelper.forms.cancelButton,
-            pressed && { opacity: 0.7 },
-            isSubmitting && { opacity: 0.5 }
+            pressed && { opacity: 0.7 }
           ]}
           onPress={() => navigation.goBack()}
           disabled={isSubmitting}
@@ -191,7 +227,7 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
           style={({ pressed }) => [
             styleHelper.forms.saveButton,
             pressed && { opacity: 0.7 },
-            isSubmitting && { opacity: 0.5 }
+            isSubmitting && { opacity: 0.7 }
           ]}
           onPress={handleSave}
           disabled={isSubmitting}
