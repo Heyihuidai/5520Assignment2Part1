@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, Platform, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Checkbox from 'expo-checkbox';
@@ -9,7 +9,6 @@ import { styleHelper, getThemeColors } from '../helper/styleHelper';
 import { addActivity, updateActivity } from '../firebase/firestoreOperations';
 
 export default function AddActivityForm({ initialData, isEditing }) {
-  // State for dropdown picker
   const [open, setOpen] = useState(false);
   const [activityType, setActivityType] = useState(null);
   const [items, setItems] = useState([
@@ -23,19 +22,16 @@ export default function AddActivityForm({ initialData, isEditing }) {
     {label: 'Other', value: 'Other'},
   ]);
   
-  // State for form inputs
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSpecial, setIsSpecial] = useState(false);
 
-  // Hooks for navigation and theming
   const navigation = useNavigation();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
-  // Initialize form with existing data when editing
   useEffect(() => {
     if (initialData) {
       setActivityType(initialData.activityType);
@@ -45,7 +41,6 @@ export default function AddActivityForm({ initialData, isEditing }) {
     }
   }, [initialData]);
 
-  // Process form submission
   const processSubmission = async () => {
     try {
       setIsSubmitting(true);
@@ -77,7 +72,6 @@ export default function AddActivityForm({ initialData, isEditing }) {
     }
   };
 
-  // Handle form submission with confirmation for updates
   const handleSave = async () => {
     if (isSubmitting) return;
 
@@ -111,14 +105,12 @@ export default function AddActivityForm({ initialData, isEditing }) {
     }
   };
 
-  // Handle date change
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
     setDate(currentDate);
   };
 
-  // Format date for display
   const formatDate = (date) => {
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
@@ -154,12 +146,16 @@ export default function AddActivityForm({ initialData, isEditing }) {
       />
 
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
-      <TouchableOpacity
-        style={styleHelper.forms.dateInput}
+      <Pressable
+        style={({ pressed }) => [
+          styleHelper.forms.dateInput,
+          pressed && { opacity: 0.7 }
+        ]}
         onPress={() => setShowDatePicker(true)}
+        android_ripple={{ color: 'rgba(0, 0, 0, 0.1)' }}
       >
         <Text style={{ color: themeColors.text }}>{formatDate(date)}</Text>
-      </TouchableOpacity>
+      </Pressable>
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -184,25 +180,31 @@ export default function AddActivityForm({ initialData, isEditing }) {
       )}
 
       <View style={styleHelper.forms.buttonContainer}>
-        <TouchableOpacity 
-          style={styleHelper.forms.cancelButton}
+        <Pressable 
+          style={({ pressed }) => [
+            styleHelper.forms.cancelButton,
+            pressed && { opacity: 0.7 }
+          ]}
           onPress={() => navigation.goBack()}
           disabled={isSubmitting}
+          android_ripple={{ color: 'rgba(0, 0, 0, 0.1)' }}
         >
           <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[
+        </Pressable>
+        <Pressable 
+          style={({ pressed }) => [
             styleHelper.forms.saveButton,
+            pressed && { opacity: 0.7 },
             isSubmitting && { opacity: 0.7 }
           ]}
           onPress={handleSave}
           disabled={isSubmitting}
+          android_ripple={{ color: 'rgba(255, 255, 255, 0.2)' }}
         >
           <Text style={styleHelper.forms.saveButtonText}>
             {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

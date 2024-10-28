@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
@@ -18,14 +18,18 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
           {error}
         </Text>
         {onRetry && (
-          <TouchableOpacity 
+          <Pressable 
             onPress={onRetry}
-            style={styleHelper.itemsList.retryButton}
+            style={({ pressed }) => [
+              styleHelper.itemsList.retryButton,
+              pressed && { opacity: 0.7 }
+            ]}
+            android_ripple={{ color: themeColors.ripple }}
           >
             <Text style={[styleHelper.itemsList.retryText, { color: themeColors.tabIcon }]}>
               Try Again
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
     );
@@ -61,12 +65,17 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
     }
 
     return (
-      <TouchableOpacity 
+      <Pressable 
         onPress={() => handleItemPress(item)}
-        style={[
+        style={({ pressed }) => [
           styleHelper.itemsList.item, 
-          { backgroundColor: themeColors.listItemBackground }
+          { backgroundColor: themeColors.listItemBackground },
+          pressed && { opacity: 0.7 }
         ]}
+        android_ripple={{
+          color: themeColors.ripple,
+          foreground: true
+        }}
       >
         <View style={styleHelper.itemsList.itemHeader}>
           <View style={styleHelper.itemsList.headerLeft}>
@@ -110,7 +119,7 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
             {formattedDate}
           </Text>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 

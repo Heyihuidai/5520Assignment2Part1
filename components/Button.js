@@ -1,10 +1,11 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Pressable, Text } from 'react-native';
+import { styleHelper } from '../helper/styleHelper';
 
 export const Button = ({ 
   onPress, 
   children, 
-  variant = 'primary', // primary, secondary, danger
+  variant = 'primary',
   disabled = false,
   style,
   textStyle,
@@ -14,10 +15,10 @@ export const Button = ({
       onPress={onPress}
       disabled={disabled}
       style={({ pressed }) => [
-        styles.button,
-        styles[variant],
-        disabled && styles.disabled,
-        pressed && styles[`${variant}Pressed`],
+        styleHelper.buttons.base,
+        styleHelper.buttons.variants[variant],
+        pressed && styleHelper.buttons.variants[`${variant}Pressed`],
+        disabled && styleHelper.buttons.states.disabled,
         style,
       ]}
       android_ripple={{
@@ -25,9 +26,9 @@ export const Button = ({
       }}
     >
       <Text style={[
-        styles.text,
-        styles[`${variant}Text`],
-        disabled && styles.disabledText,
+        styleHelper.buttons.text.base,
+        styleHelper.buttons.text[variant],
+        disabled && styleHelper.buttons.text.disabled,
         textStyle,
       ]}>
         {children}

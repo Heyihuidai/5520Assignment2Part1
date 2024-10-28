@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,23 +23,38 @@ function MainTabs() {
   // Modified header buttons with no spacing between icons
   const headerButtons = (navigation, navigateTo, iconType) => (
     <View style={{ flexDirection: 'row', marginRight: 15 }}>
-      <TouchableOpacity
+      <Pressable
         onPress={() => navigation.navigate(navigateTo)}
-        style={{ marginRight: 2 }}  // Minimal spacing just to prevent icons from touching
+        style={({ pressed }) => [
+          { marginRight: 2 },  // Minimal spacing just to prevent icons from touching
+          pressed && { opacity: 0.7 }
+        ]}
+        android_ripple={{
+          color: themeColors.ripple,
+          radius: 20,
+          borderless: true
+        }}
       >
         <Ionicons 
           name="add"
           size={24}
           color={themeColors.headerText}
         />
-      </TouchableOpacity>
-      <TouchableOpacity>
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => pressed && { opacity: 0.7 }}
+        android_ripple={{
+          color: themeColors.ripple,
+          radius: 20,
+          borderless: true
+        }}
+      >
         <Ionicons 
           name={iconType === 'activity' ? 'fitness' : 'restaurant'}
           size={24}
           color={themeColors.headerText}
         />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 

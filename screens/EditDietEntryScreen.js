@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Alert, TouchableOpacity } from 'react-native';
+import { View, Alert, Pressable } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AddDietEntryForm from '../components/AddDietEntryForm';
 import { useTheme } from '../context/ThemeContext';
@@ -45,16 +45,24 @@ export default function EditDietEntryScreen({ route, navigation }) {
     navigation.setOptions({
       title: "Edit Diet Entry",
       headerRight: () => (
-        <TouchableOpacity 
+        <Pressable 
           onPress={handleDelete}
-          style={{ marginRight: 15 }}
+          style={({ pressed }) => [
+            { marginRight: 15 },
+            pressed && { opacity: 0.7 }
+          ]}
+          android_ripple={{
+            color: themeColors.ripple,
+            radius: 20,
+            borderless: true
+          }}
         >
           <MaterialIcons 
             name="delete" 
             size={24} 
             color={themeColors.text}
           />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
   }, [navigation, themeColors.text]);

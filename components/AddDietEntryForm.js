@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
@@ -139,12 +139,16 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
 
       {/* Date picker */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
-      <TouchableOpacity
-        style={styleHelper.forms.dateInput}
+      <Pressable
+        style={({ pressed }) => [
+          styleHelper.forms.dateInput,
+          pressed && { opacity: 0.7 }
+        ]}
         onPress={() => setShowDatePicker(true)}
+        android_ripple={{ color: themeColors.ripple }}
       >
         <Text style={{ color: themeColors.text }}>{formatDate(date)}</Text>
-      </TouchableOpacity>
+      </Pressable>
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -171,25 +175,32 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
 
       {/* Form buttons */}
       <View style={styleHelper.forms.buttonContainer}>
-        <TouchableOpacity 
-          style={styleHelper.forms.cancelButton}
+        <Pressable 
+          style={({ pressed }) => [
+            styleHelper.forms.cancelButton,
+            pressed && { opacity: 0.7 },
+            isSubmitting && { opacity: 0.5 }
+          ]}
           onPress={() => navigation.goBack()}
           disabled={isSubmitting}
+          android_ripple={{ color: '#cccccc' }}
         >
           <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[
+        </Pressable>
+        <Pressable 
+          style={({ pressed }) => [
             styleHelper.forms.saveButton,
-            isSubmitting && { opacity: 0.7 }
+            pressed && { opacity: 0.7 },
+            isSubmitting && { opacity: 0.5 }
           ]}
           onPress={handleSave}
           disabled={isSubmitting}
+          android_ripple={{ color: '#2471cc' }}
         >
           <Text style={styleHelper.forms.saveButtonText}>
             {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
