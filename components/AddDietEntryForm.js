@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 import { addDietEntry, updateDietEntry } from '../firebase/firestoreOperations'
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
+import { Pressable } from '../components/Pressable';
+import { PRESSABLE_TYPES } from '../hooks/usePressableFeedback';
 
 export default function AddDietEntryForm({ initialData, isEditing }) {
   const [description, setDescription] = useState('');
@@ -39,7 +41,6 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
     
     setIsSpecial(newValue);
     
-    // If we're unchecking the special status, update immediately in Firestore
     if (!newValue && isEditing && initialData?.id) {
       console.log('Attempting to update Firestore - removing special status');
       try {
@@ -47,7 +48,7 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         const updatedData = {
           ...initialData,
           isSpecial: false,
-          lastUpdated: new Date().toISOString(), // Add this to trigger a UI refresh
+          lastUpdated: new Date().toISOString(),
         };
         console.log('Data being sent to Firestore:', updatedData);
         
@@ -79,7 +80,7 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         calories: parseInt(calories, 10),
         date: date.toISOString().split('T')[0],
         isSpecial,
-        lastUpdated: new Date().toISOString(), // Add this to trigger a UI refresh
+        lastUpdated: new Date().toISOString(),
       };
 
       let success;
@@ -172,12 +173,9 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
 
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
       <Pressable
-        style={({ pressed }) => [
-          styleHelper.forms.dateInput,
-          pressed && { opacity: 0.7 }
-        ]}
+        type={PRESSABLE_TYPES.DATE}
+        style={styleHelper.forms.dateInput}
         onPress={() => setShowDatePicker(true)}
-        android_ripple={{ color: themeColors.ripple }}
       >
         <Text style={{ color: themeColors.text }}>{formatDate(date)}</Text>
       </Pressable>
@@ -201,6 +199,7 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
             disabled={isSubmitting}
           />
           <Pressable 
+            type={PRESSABLE_TYPES.CHECKBOX}
             onPress={() => !isSubmitting && handleSpecialChange(!isSpecial)}
             style={styleHelper.forms.checkboxLabelContainer}
           >
@@ -213,25 +212,21 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
 
       <View style={styleHelper.forms.buttonContainer}>
         <Pressable 
-          style={({ pressed }) => [
-            styleHelper.forms.cancelButton,
-            pressed && { opacity: 0.7 }
-          ]}
+          type={PRESSABLE_TYPES.CANCEL}
+          style={styleHelper.forms.cancelButton}
           onPress={() => navigation.goBack()}
           disabled={isSubmitting}
-          android_ripple={{ color: '#cccccc' }}
         >
           <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
         </Pressable>
         <Pressable 
-          style={({ pressed }) => [
+          type={PRESSABLE_TYPES.SAVE}
+          style={[
             styleHelper.forms.saveButton,
-            pressed && { opacity: 0.7 },
             isSubmitting && { opacity: 0.7 }
           ]}
           onPress={handleSave}
           disabled={isSubmitting}
-          android_ripple={{ color: '#2471cc' }}
         >
           <Text style={styleHelper.forms.saveButtonText}>
             {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}

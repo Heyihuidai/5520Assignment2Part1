@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 import { format } from 'date-fns';
+import { Pressable } from '../components/Pressable';
+import { PRESSABLE_TYPES } from '../hooks/usePressableFeedback';
 
 export default function ItemsList({ type, data, loading, error, onRetry }) {
   const navigation = useNavigation();
@@ -19,12 +21,9 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
         </Text>
         {onRetry && (
           <Pressable 
+            type={PRESSABLE_TYPES.DEFAULT}
             onPress={onRetry}
-            style={({ pressed }) => [
-              styleHelper.itemsList.retryButton,
-              pressed && { opacity: 0.7 }
-            ]}
-            android_ripple={{ color: themeColors.ripple }}
+            style={styleHelper.itemsList.retryButton}
           >
             <Text style={[styleHelper.itemsList.retryText, { color: themeColors.tabIcon }]}>
               Try Again
@@ -66,15 +65,15 @@ export default function ItemsList({ type, data, loading, error, onRetry }) {
 
     return (
       <Pressable 
+        type={PRESSABLE_TYPES.DEFAULT}
         onPress={() => handleItemPress(item)}
-        style={({ pressed }) => [
+        style={[
           styleHelper.itemsList.item, 
-          { backgroundColor: themeColors.listItemBackground },
-          pressed && { opacity: 0.7 }
+          { backgroundColor: themeColors.listItemBackground }
         ]}
-        android_ripple={{
-          color: themeColors.ripple,
-          foreground: true
+        feedbackConfig={{
+          rippleColor: themeColors.ripple,
+          rippleBorderless: false
         }}
       >
         <View style={styleHelper.itemsList.itemHeader}>

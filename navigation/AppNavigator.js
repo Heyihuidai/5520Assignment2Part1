@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import EditActivityScreen from '../screens/EditActivityScreen';
 import EditDietEntryScreen from '../screens/EditDietEntryScreen';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
+import { Pressable } from '../components/Pressable';
+import { PRESSABLE_TYPES } from '../hooks/usePressableFeedback';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -20,19 +22,16 @@ function MainTabs() {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
-  // Modified header buttons with no spacing between icons
   const headerButtons = (navigation, navigateTo, iconType) => (
     <View style={{ flexDirection: 'row', marginRight: 15 }}>
       <Pressable
+        type={PRESSABLE_TYPES.DEFAULT}
         onPress={() => navigation.navigate(navigateTo)}
-        style={({ pressed }) => [
-          { marginRight: 2 },  // Minimal spacing just to prevent icons from touching
-          pressed && { opacity: 0.7 }
-        ]}
-        android_ripple={{
-          color: themeColors.ripple,
-          radius: 20,
-          borderless: true
+        style={{ marginRight: 2 }}
+        feedbackConfig={{
+          rippleColor: themeColors.ripple,
+          rippleRadius: 20,
+          rippleBorderless: true
         }}
       >
         <Ionicons 
@@ -42,11 +41,11 @@ function MainTabs() {
         />
       </Pressable>
       <Pressable
-        style={({ pressed }) => pressed && { opacity: 0.7 }}
-        android_ripple={{
-          color: themeColors.ripple,
-          radius: 20,
-          borderless: true
+        type={PRESSABLE_TYPES.DEFAULT}
+        feedbackConfig={{
+          rippleColor: themeColors.ripple,
+          rippleRadius: 20,
+          rippleBorderless: true
         }}
       >
         <Ionicons 

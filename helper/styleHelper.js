@@ -326,3 +326,60 @@ export const getThemeColors = (isDarkMode) => {
   
   return isDarkMode ? styleHelper.colors.dark : styleHelper.colors.light;
 };
+
+export const pressableConfig = {
+  types: {
+    DEFAULT: 'default',
+    DANGER: 'danger',
+    DATE: 'date',
+    CANCEL: 'cancel',
+    SAVE: 'save',
+    CHECKBOX: 'checkbox'
+  },
+  
+  styles: {
+    default: {
+      rippleColor: 'rgba(0, 0, 0, 0.2)',
+      pressedOpacity: 0.65,
+      disabledOpacity: 0.4,
+      rippleBorderless: false,
+      pressedScale: 0.95,
+      pressAnimationDuration: 100
+    },
+    
+    danger: {
+      rippleColor: 'rgba(255, 59, 48, 0.3)',
+      pressedOpacity: 0.7,
+      pressedScale: 0.92,
+      rippleBorderless: false
+    },
+    
+    date: {
+      rippleColor: 'rgba(94, 53, 177, 0.2)', // Using primary color
+      pressedOpacity: 0.7,
+      pressedScale: 0.97,
+      rippleBorderless: false
+    },
+    
+    cancel: {
+      rippleColor: 'rgba(0, 0, 0, 0.15)',
+      pressedOpacity: 0.5,
+      pressedScale: 0.94,
+      rippleBorderless: true
+    },
+    
+    save: {
+      rippleColor: 'rgba(255, 255, 255, 0.3)',
+      pressedOpacity: 0.75,
+      pressedScale: 0.94,
+      rippleBorderless: false
+    },
+    
+    checkbox: {
+      rippleColor: 'rgba(94, 53, 177, 0.15)', // Using primary color
+      pressedOpacity: 0.6,
+      pressedScale: 0.9,
+      rippleBorderless: true
+    }
+  }
+};

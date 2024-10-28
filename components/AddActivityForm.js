@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, Platform, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Checkbox from 'expo-checkbox';
@@ -7,6 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
 import { addActivity, updateActivity } from '../firebase/firestoreOperations';
+import { Pressable } from '../components/Pressable';
+import { PRESSABLE_TYPES } from '../hooks/usePressableFeedback';
 
 export default function AddActivityForm({ initialData, isEditing }) {
   const [open, setOpen] = useState(false);
@@ -90,8 +92,8 @@ export default function AddActivityForm({ initialData, isEditing }) {
         activityType,
         duration: parseInt(duration, 10),
         date: date.toISOString().split('T')[0],
-        isSpecial, // This will be false if checkbox is unchecked
-        lastUpdated: new Date().toISOString(), // Add this to trigger a UI refresh
+        isSpecial,
+        lastUpdated: new Date().toISOString(),
       };
 
       let success;
@@ -189,12 +191,9 @@ export default function AddActivityForm({ initialData, isEditing }) {
 
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
       <Pressable
-        style={({ pressed }) => [
-          styleHelper.forms.dateInput,
-          pressed && { opacity: 0.7 }
-        ]}
+        type={PRESSABLE_TYPES.DATE}
+        style={styleHelper.forms.dateInput}
         onPress={() => setShowDatePicker(true)}
-        android_ripple={{ color: 'rgba(0, 0, 0, 0.1)' }}
       >
         <Text style={{ color: themeColors.text }}>{formatDate(date)}</Text>
       </Pressable>
@@ -218,6 +217,7 @@ export default function AddActivityForm({ initialData, isEditing }) {
             disabled={isSubmitting}
           />
           <Pressable 
+            type={PRESSABLE_TYPES.CHECKBOX}
             onPress={() => !isSubmitting && handleSpecialChange(!isSpecial)}
             style={styleHelper.forms.checkboxLabelContainer}
           >
@@ -230,25 +230,21 @@ export default function AddActivityForm({ initialData, isEditing }) {
 
       <View style={styleHelper.forms.buttonContainer}>
         <Pressable 
-          style={({ pressed }) => [
-            styleHelper.forms.cancelButton,
-            pressed && { opacity: 0.7 }
-          ]}
+          type={PRESSABLE_TYPES.CANCEL}
+          style={styleHelper.forms.cancelButton}
           onPress={() => navigation.goBack()}
           disabled={isSubmitting}
-          android_ripple={{ color: 'rgba(0, 0, 0, 0.1)' }}
         >
           <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
         </Pressable>
         <Pressable 
-          style={({ pressed }) => [
+          type={PRESSABLE_TYPES.SAVE}
+          style={[
             styleHelper.forms.saveButton,
-            pressed && { opacity: 0.7 },
             isSubmitting && { opacity: 0.7 }
           ]}
           onPress={handleSave}
           disabled={isSubmitting}
-          android_ripple={{ color: 'rgba(255, 255, 255, 0.2)' }}
         >
           <Text style={styleHelper.forms.saveButtonText}>
             {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
