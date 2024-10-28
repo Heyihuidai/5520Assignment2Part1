@@ -1,4 +1,3 @@
-// hooks/usePressableFeedback.js
 import { useCallback } from 'react';
 import { Platform } from 'react-native';
 import { pressableConfig } from '../helper/styleHelper';
