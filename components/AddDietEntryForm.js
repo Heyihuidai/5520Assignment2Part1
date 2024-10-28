@@ -28,7 +28,7 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
       setCalories(initialData.calories.toString());
       setDate(new Date(initialData.date));
       if (initialData.isSpecial === true) {
-        setIsSpecial(true);
+        setIsSpecial(false);
         setWasInitiallySpecial(true);
       }
     }
@@ -41,13 +41,14 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
     
     setIsSpecial(newValue);
     
-    if (!newValue && isEditing && initialData?.id) {
-      console.log('Attempting to update Firestore - removing special status');
+    // If we're approving the special status, update immediately in Firestore
+    if (newValue && isEditing && initialData?.id) {
+      console.log('Attempting to update Firestore - approving special status');
       try {
         setIsSubmitting(true);
         const updatedData = {
           ...initialData,
-          isSpecial: false,
+          isSpecial: true,
           lastUpdated: new Date().toISOString(),
         };
         console.log('Data being sent to Firestore:', updatedData);
@@ -57,13 +58,13 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
         
         if (!success) {
           console.log('Update failed, reverting checkbox');
-          setIsSpecial(true);
+          setIsSpecial(false);
           Alert.alert("Error", "Failed to update special status. Please try again.");
         }
       } catch (error) {
         console.error("Error updating special status:", error);
         console.log('Error occurred, reverting checkbox');
-        setIsSpecial(true);
+        setIsSpecial(false);
         Alert.alert("Error", "An unexpected error occurred. Please try again.");
       } finally {
         setIsSubmitting(false);
@@ -190,7 +191,10 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
       )}
 
       {isEditing && wasInitiallySpecial && (
-        <View style={styleHelper.forms.checkboxContainer}>
+        <View style={[
+          styleHelper.forms.checkboxContainer,
+          { marginHorizontal: 16 }
+        ]}>
           <Checkbox
             value={isSpecial}
             onValueChange={handleSpecialChange}
@@ -204,7 +208,7 @@ export default function AddDietEntryForm({ initialData, isEditing }) {
             style={styleHelper.forms.checkboxLabelContainer}
           >
             <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
-              Keep Special Status
+            This item is marked as special. Select the checkbox if you would like to approve it.
             </Text>
           </Pressable>
         </View>
