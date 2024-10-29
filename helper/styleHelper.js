@@ -4,23 +4,29 @@ export const styleHelper = {
       primary: '#5e35b1',
       background: '#e6e1f2',
       text: '#000000',
+      textSecondary: '#666666',
+      textTertiary: '#999999',
       inputBackground: '#d3d3d3',
       headerText: '#ffffff',
       tabIcon: '#FFA500',
       tabBarBackground: '#5e35b1',
       tabBarInactiveIcon: 'rgba(255,165,0,0.7)',
       listItemBackground: '#d3d3d3',
+      warning: '#FFA500',
     },
     dark: {
       primary: '#5e35b1',
       background: '#121212',
       text: '#ffffff',
+      textSecondary: '#B3B3B3',
+      textTertiary: '#808080',
       inputBackground: '#2a2a2a',
       headerText: '#ffffff',
       tabIcon: '#FFA500',
       tabBarBackground: '#5e35b1',
       tabBarInactiveIcon: 'rgba(255,165,0,0.5)',
       listItemBackground: '#8B4513',
+      warning: '#FFA500',
     }
   },
   spacing: {
@@ -119,10 +125,10 @@ export const styleHelper = {
       borderRadius: 5,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#5e35b1', // Purple color
+      backgroundColor: '#5e35b1',
     },
     cancelButtonText: {
-      color: '#5e35b1', // Purple color
+      color: '#5e35b1',
       fontSize: 16,
       fontWeight: 'bold',
     },
@@ -130,6 +136,17 @@ export const styleHelper = {
       color: 'white',
       fontSize: 16,
       fontWeight: 'bold',
+    },
+    checkboxContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+    checkbox: {
+      marginRight: 10,
+    },
+    checkboxLabel: {
+      fontSize: 16,
     },
   },
   screens: {
@@ -190,24 +207,49 @@ export const styleHelper = {
   },
   itemsList: {
     container: {
-      marginTop: styleHelper.spacing.medium,
-      marginHorizontal: styleHelper.spacing.medium,
+      marginTop: 16,
+      marginHorizontal: 16,
     },
     item: {
       padding: 16,
       marginBottom: 8,
       borderRadius: 8,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 2,
     },
     itemHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       marginBottom: 8,
+    },
+    headerLeft: {
+      flex: 1,
     },
     itemTitle: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: 'white',
+      marginBottom: 4,
+    },
+    duration: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    calories: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    dateText: {
+      fontSize: 12,
+    },
+    alertIcon: {
+      marginLeft: 8,
     },
     itemDetails: {
       flexDirection: 'row',
@@ -215,13 +257,25 @@ export const styleHelper = {
     },
     itemText: {
       fontSize: 14,
-      color: 'white',
     },
     emptyText: {
       textAlign: 'center',
       marginTop: 32,
       fontSize: 16,
-      color: 'white',
+    },
+    errorText: {
+      fontSize: 16,
+      textAlign: 'center',
+      marginHorizontal: 20,
+    },
+    retryButton: {
+      marginTop: 10,
+      padding: 10,
+      borderRadius: 5,
+    },
+    retryText: {
+      fontSize: 16,
+      fontWeight: '500',
     },
   },
   modal: {
@@ -271,4 +325,61 @@ export const getThemeColors = (isDarkMode) => {
   }
   
   return isDarkMode ? styleHelper.colors.dark : styleHelper.colors.light;
+};
+
+export const pressableConfig = {
+  types: {
+    DEFAULT: 'default',
+    DANGER: 'danger',
+    DATE: 'date',
+    CANCEL: 'cancel',
+    SAVE: 'save',
+    CHECKBOX: 'checkbox'
+  },
+  
+  styles: {
+    default: {
+      rippleColor: 'rgba(0, 0, 0, 0.2)',
+      pressedOpacity: 0.65,
+      disabledOpacity: 0.4,
+      rippleBorderless: false,
+      pressedScale: 0.95,
+      pressAnimationDuration: 100
+    },
+    
+    danger: {
+      rippleColor: 'rgba(255, 59, 48, 0.3)',
+      pressedOpacity: 0.7,
+      pressedScale: 0.92,
+      rippleBorderless: false
+    },
+    
+    date: {
+      rippleColor: 'rgba(94, 53, 177, 0.2)', // Using primary color
+      pressedOpacity: 0.7,
+      pressedScale: 0.97,
+      rippleBorderless: false
+    },
+    
+    cancel: {
+      rippleColor: 'rgba(0, 0, 0, 0.15)',
+      pressedOpacity: 0.5,
+      pressedScale: 0.94,
+      rippleBorderless: true
+    },
+    
+    save: {
+      rippleColor: 'rgba(255, 255, 255, 0.3)',
+      pressedOpacity: 0.75,
+      pressedScale: 0.94,
+      rippleBorderless: false
+    },
+    
+    checkbox: {
+      rippleColor: 'rgba(94, 53, 177, 0.15)', // Using primary color
+      pressedOpacity: 0.6,
+      pressedScale: 0.9,
+      rippleBorderless: true
+    }
+  }
 };

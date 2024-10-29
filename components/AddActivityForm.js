@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Platform, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Checkbox from 'expo-checkbox';
 import { useNavigation } from '@react-navigation/native';
-import { useData } from '../context/DataContext';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
+import { addActivity, updateActivity } from '../firebase/firestoreOperations';
+import { Pressable } from '../components/Pressable';
+import { PRESSABLE_TYPES } from '../hooks/usePressableFeedback';
 
-export default function AddActivityForm() {
-  // State for dropdown picker
+export default function AddActivityForm({ initialData, isEditing }) {
   const [open, setOpen] = useState(false);
   const [activityType, setActivityType] = useState(null);
   const [items, setItems] = useState([
-    /* Activity options */
     {label: 'Walking', value: 'Walking'},
     {label: 'Running', value: 'Running'},
     {label: 'Swimming', value: 'Swimming'},
@@ -23,20 +24,101 @@ export default function AddActivityForm() {
     {label: 'Other', value: 'Other'},
   ]);
   
-  // State for form inputs
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(false);
+  const [wasInitiallySpecial, setWasInitiallySpecial] = useState(false);
 
-  // Hooks for navigation, data management, and theming
   const navigation = useNavigation();
-  const { addActivity } = useData();
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
-  // Handle form submission
-  const handleSave = () => {
-    // Validate inputs
+  useEffect(() => {
+    if (initialData) {
+      setActivityType(initialData.activityType);
+      setDuration(initialData.duration.toString());
+      setDate(new Date(initialData.date));
+      if (initialData.isSpecial === true) {
+        setIsSpecial(false); // Start unchecked when item is special
+        setWasInitiallySpecial(true);
+      }
+    }
+  }, [initialData]);
+
+  const handleSpecialChange = async (newValue) => {
+    console.log('Checkbox changed. New value:', newValue);
+    console.log('Current isSpecial state:', isSpecial);
+    console.log('Initial data:', initialData);
+    
+    setIsSpecial(newValue);
+    
+    // If we're approving the special status, update immediately in Firestore
+    if (newValue && isEditing && initialData?.id) {
+      console.log('Attempting to update Firestore - approving special status');
+      try {
+        setIsSubmitting(true);
+        const updatedData = {
+          ...initialData,
+          isSpecial: true
+        };
+        console.log('Data being sent to Firestore:', updatedData);
+        
+        const success = await updateActivity(initialData.id, updatedData);
+        console.log('Firestore update result:', success);
+        
+        if (!success) {
+          console.log('Update failed, reverting checkbox');
+          setIsSpecial(false);
+          Alert.alert("Error", "Failed to update special status. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error updating special status:", error);
+        console.log('Error occurred, reverting checkbox');
+        setIsSpecial(false);
+        Alert.alert("Error", "An unexpected error occurred. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const processSubmission = async () => {
+    try {
+      setIsSubmitting(true);
+      
+      const activityData = {
+        activityType,
+        duration: parseInt(duration, 10),
+        date: date.toISOString().split('T')[0],
+        isSpecial,
+        lastUpdated: new Date().toISOString(),
+      };
+
+      let success;
+      if (isEditing) {
+        success = await updateActivity(initialData.id, activityData);
+      } else {
+        success = await addActivity(activityData);
+      }
+      
+      if (success) {
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", `Failed to ${isEditing ? 'update' : 'add'} activity. Please try again.`);
+      }
+    } catch (error) {
+      console.error(`Error ${isEditing ? 'updating' : 'adding'} activity:`, error);
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (isSubmitting) return;
+
     if (!activityType) {
       Alert.alert("Alert", "Please select an activity.");
       return;
@@ -46,29 +128,33 @@ export default function AddActivityForm() {
       return;
     }
 
-    // Create and save new activity
-    const newActivity = {
-      activityType,
-      duration: parseInt(duration, 10),
-      date: date.toISOString().split('T')[0],
-    };
-
-    const success = addActivity(newActivity);
-    if (success) {
-      navigation.goBack();
+    if (isEditing) {
+      Alert.alert(
+        "Important",
+        "Are you sure you want to save these changes?",
+        [
+          { 
+            text: "No", 
+            style: "cancel" 
+          },
+          { 
+            text: "Yes",
+            onPress: processSubmission
+          }
+        ],
+        { cancelable: false }
+      );
     } else {
-      Alert.alert("Alert", "Failed to add activity. Please try again.");
+      await processSubmission();
     }
   };
 
-  // Handle date change
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
     setDate(currentDate);
   };
 
-  // Format date for display
   const formatDate = (date) => {
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
@@ -76,10 +162,8 @@ export default function AddActivityForm() {
 
   return (
     <View style={styleHelper.forms.container}>
-      {/* Activity dropdown */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Activity *</Text>
       <DropDownPicker
-        /* DropDownPicker props */
         open={open}
         value={activityType}
         items={items}
@@ -95,10 +179,8 @@ export default function AddActivityForm() {
         ]}
       />
 
-      {/* Duration input */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Duration (min) *</Text>
       <TextInput
-        /* TextInput props */
         style={[styleHelper.forms.input, { color: themeColors.text }]}
         value={duration}
         onChangeText={setDuration}
@@ -107,41 +189,70 @@ export default function AddActivityForm() {
         placeholderTextColor={themeColors.text}
       />
 
-      {/* Date picker */}
       <Text style={[styleHelper.forms.label, { color: themeColors.text }]}>Date *</Text>
-      <TouchableOpacity
+      <Pressable
+        type={PRESSABLE_TYPES.DATE}
         style={styleHelper.forms.dateInput}
         onPress={() => setShowDatePicker(true)}
       >
         <Text style={{ color: themeColors.text }}>{formatDate(date)}</Text>
-      </TouchableOpacity>
+      </Pressable>
       {showDatePicker && (
         <DateTimePicker
-          /* DateTimePicker props */
           value={date}
           mode="date"
           display="inline"
           onChange={onChangeDate}
           style={styleHelper.forms.datePicker}
-          
-
         />
       )}
 
-      {/* Form buttons */}
+      {isEditing && wasInitiallySpecial && (
+        <View style={[
+          styleHelper.forms.checkboxContainer,
+          { marginHorizontal: 16 }
+        ]}>
+          <Checkbox
+            value={isSpecial}
+            onValueChange={handleSpecialChange}
+            style={styleHelper.forms.checkbox}
+            color={isSpecial ? themeColors.primary : undefined}
+            disabled={isSubmitting}
+          />
+          <Pressable 
+            type={PRESSABLE_TYPES.CHECKBOX}
+            onPress={() => !isSubmitting && handleSpecialChange(!isSpecial)}
+            style={styleHelper.forms.checkboxLabelContainer}
+          >
+            <Text style={[styleHelper.forms.checkboxLabel, { color: themeColors.text }]}>
+              This item is marked as special. Select the checkbox if you would like to approve it.
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
       <View style={styleHelper.forms.buttonContainer}>
-        <TouchableOpacity 
+        <Pressable 
+          type={PRESSABLE_TYPES.CANCEL}
           style={styleHelper.forms.cancelButton}
           onPress={() => navigation.goBack()}
+          disabled={isSubmitting}
         >
           <Text style={styleHelper.forms.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styleHelper.forms.saveButton}
+        </Pressable>
+        <Pressable 
+          type={PRESSABLE_TYPES.SAVE}
+          style={[
+            styleHelper.forms.saveButton,
+            isSubmitting && { opacity: 0.7 }
+          ]}
           onPress={handleSave}
+          disabled={isSubmitting}
         >
-          <Text style={styleHelper.forms.saveButtonText}>Save</Text>
-        </TouchableOpacity>
+          <Text style={styleHelper.forms.saveButtonText}>
+            {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );

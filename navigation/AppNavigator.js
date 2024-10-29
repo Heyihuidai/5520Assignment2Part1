@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,37 +8,58 @@ import DietScreen from '../screens/DietScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AddActivityScreen from '../screens/AddActivityScreen';
 import AddDietEntryScreen from '../screens/AddDietEntryScreen';
+import EditActivityScreen from '../screens/EditActivityScreen';
+import EditDietEntryScreen from '../screens/EditDietEntryScreen';
 import { useTheme } from '../context/ThemeContext';
 import { styleHelper, getThemeColors } from '../helper/styleHelper';
+import { Pressable } from '../components/Pressable';
+import { PRESSABLE_TYPES } from '../hooks/usePressableFeedback';
 
-// Create navigator instances
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// MainTabs component: Defines the bottom tab navigation
 function MainTabs() {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
 
-  // Custom "Add" button for the header
-  const addButton = (navigation, navigateTo) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate(navigateTo)}
-      style={styleHelper.header?.addButton || { marginRight: 15 }}
-    >
-      <Text style={[
-        styleHelper.header?.addButtonText || { fontSize: 16, fontWeight: 'bold' },
-        { color: themeColors.headerText }
-      ]}>
-        Add
-      </Text>
-    </TouchableOpacity>
+  const headerButtons = (navigation, navigateTo, iconType) => (
+    <View style={{ flexDirection: 'row', marginRight: 15 }}>
+      <Pressable
+        type={PRESSABLE_TYPES.DEFAULT}
+        onPress={() => navigation.navigate(navigateTo)}
+        style={{ marginRight: 2 }}
+        feedbackConfig={{
+          rippleColor: themeColors.ripple,
+          rippleRadius: 20,
+          rippleBorderless: true
+        }}
+      >
+        <Ionicons 
+          name="add"
+          size={24}
+          color={themeColors.headerText}
+        />
+      </Pressable>
+      <Pressable
+        type={PRESSABLE_TYPES.DEFAULT}
+        feedbackConfig={{
+          rippleColor: themeColors.ripple,
+          rippleRadius: 20,
+          rippleBorderless: true
+        }}
+      >
+        <Ionicons 
+          name={iconType === 'activity' ? 'fitness' : 'restaurant'}
+          size={24}
+          color={themeColors.headerText}
+        />
+      </Pressable>
+    </View>
   );
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        // Custom tab bar icon configuration
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'Activities') {
@@ -50,7 +71,6 @@ function MainTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        // Theme-based styling for tab bar and header
         tabBarActiveTintColor: themeColors.tabIcon,
         tabBarInactiveTintColor: themeColors.tabBarInactiveIcon,
         tabBarStyle: {
@@ -68,14 +88,14 @@ function MainTabs() {
         name="Activities" 
         component={ActivitiesScreen}
         options={({ navigation }) => ({
-          headerRight: () => addButton(navigation, 'AddActivity'),
+          headerRight: () => headerButtons(navigation, 'AddActivity', 'activity'),
         })}
       />
       <Tab.Screen 
         name="Diet" 
         component={DietScreen}
         options={({ navigation }) => ({
-          headerRight: () => addButton(navigation, 'AddDietEntry'),
+          headerRight: () => headerButtons(navigation, 'AddDietEntry', 'diet'),
         })}
       />
       <Tab.Screen name="Settings" component={SettingsScreen} />
@@ -83,7 +103,6 @@ function MainTabs() {
   );
 }
 
-// AppNavigator: Root navigation component
 export default function AppNavigator() {
   const { isDarkMode } = useTheme();
   const themeColors = getThemeColors(isDarkMode);
@@ -97,15 +116,15 @@ export default function AppNavigator() {
         headerTintColor: themeColors.headerText,
       }}
     >
-      {/* Main tabs screen (nested navigation) */}
       <Stack.Screen 
         name="Main" 
         component={MainTabs} 
         options={{ headerShown: false }}
       />
-      {/* Additional screens for adding activities and diet entries */}
       <Stack.Screen name="AddActivity" component={AddActivityScreen} />
       <Stack.Screen name="AddDietEntry" component={AddDietEntryScreen} />
+      <Stack.Screen name="EditActivity" component={EditActivityScreen} />
+      <Stack.Screen name="EditDietEntry" component={EditDietEntryScreen} />
     </Stack.Navigator>
   );
 }
